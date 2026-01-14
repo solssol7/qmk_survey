@@ -11,10 +11,8 @@
   <link rel="stylesheet" href="./assets/css/components.css" />
 
   <style>
-    /* 1. 전체 레이아웃 & 폰트 개선 */
-    body {
-      background-color: #f8f9fa; /* 배경을 아주 연한 회색으로 변경하여 카드와 구분 */
-    }
+    /* 1. 레이아웃 & 폰트 설정 */
+    body { background-color: #f8f9fa; }
     .app {
       display: flex;
       justify-content: center;
@@ -22,36 +20,34 @@
       min-height: 100vh;
       padding: 20px;
     }
-    .stage {
-      width: 100%;
-      max-width: 500px; /* 모바일 최적화 너비 */
-    }
-    
-    /* 2. 카드 디자인: 그림자 강화 + 둥근 모서리 */
+    .stage { width: 100%; max-width: 500px; }
+
+    /* 2. 카드 디자인 개선 */
     .card {
-      border: none !important; /* 투박한 테두리 제거 */
+      border: none !important;
       border-radius: 24px !important;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important; /* 부드러운 그림자 */
+      box-shadow: 0 10px 40px rgba(0,0,0,0.08) !important;
       overflow: hidden;
       background: #ffffff;
     }
 
-    /* 3. 헤더 영역 깔끔하게 */
-    .topline { border-bottom: none !important; }
+    /* 3. 상단 헤더 & 네비게이션 */
     .brandRow {
-      border-bottom: none !important; /* 굵은 주황색 줄 제거 */
+      border: none !important;
       height: 60px;
       position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-    .brandRow__kicker { display: none; } /* 지저분한 작은 텍스트 숨김 */
-    .brandRow__brand {
-      font-size: 18px;
-      color: #333;
-      font-weight: 800;
-    }
+    /* 뒤로가기 버튼 왼쪽 상단 고정 */
     .iconBtn {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
       border: none !important;
-      background: #f1f3f5 !important; /* 연한 회색 원형 버튼 */
+      background: #f1f3f5 !important;
       width: 36px;
       height: 36px;
       border-radius: 50%;
@@ -60,96 +56,100 @@
       justify-content: center;
       font-size: 18px;
       color: #333;
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      padding: 0;
-      transition: background 0.2s;
+      cursor: pointer;
+      z-index: 10;
     }
-    .iconBtn:active { background: #dee2e6 !important; }
+    .brandRow__brand { font-size: 18px; font-weight: 800; color: #333; }
+    .progressTiny { font-size: 14px; font-weight: 700; color: #adb5bd; }
 
-    /* 4. 버튼 디자인 현대화 (가장 중요) */
+    /* 4. 프로그레스 바 공통 스타일 */
+    .progressBarContainer {
+      padding: 0 20px 10px; /* 좌우 여백 */
+    }
+    .progressBar {
+      height: 6px;
+      background: #f1f3f5;
+      border-radius: 99px;
+      overflow: hidden;
+      border: none !important;
+    }
+    .progressBar__fill {
+      height: 100%;
+      background: linear-gradient(90deg, #FF6B6B, #FF8E53);
+      transition: width 0.3s ease;
+    }
+
+    /* 5. 버튼 디자인 (그라데이션 & 그림자) */
     .btn {
-      border: none !important; /* 굵은 테두리 제거 */
+      border: none !important;
       border-radius: 16px !important;
       font-weight: 700 !important;
-      transition: transform 0.1s, box-shadow 0.2s !important;
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      transition: transform 0.1s;
     }
     .btn:active { transform: scale(0.97); }
-
-    /* 메인 버튼 (그라데이션 적용) */
     .btn--pillPrimary {
-      background: linear-gradient(135deg, #FF6B6B, #FF8E53) !important; /* 트렌디한 코랄 오렌지 */
+      background: linear-gradient(135deg, #FF6B6B, #FF8E53) !important;
       color: white !important;
       box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4) !important;
     }
-    
-    /* 서브 버튼 */
-    .btn--pillGhost {
-      background: #f1f3f5 !important;
-      color: #495057 !important;
-      border: none !important;
-    }
+    .btn--pillGhost { background: #f1f3f5 !important; color: #495057 !important; }
 
-    /* 선택지 버튼 (퀴즈) */
+    /* 6. 선택지 버튼 */
     .choicePill {
-      border: 1px solid #e9ecef !important; /* 연한 테두리 */
+      border: 1px solid #e9ecef !important;
       background: #fff !important;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
       border-radius: 16px !important;
-      transition: all 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
       color: #333;
+      transition: all 0.2s;
     }
     .choicePill:hover {
       border-color: #FF8E53 !important;
       background: #fff7ed !important;
     }
-    .choicePill:active {
-      transform: scale(0.98);
-      background: #ffe8cc !important;
-    }
 
-    /* 5. 텍스트 가독성 (Word Break) */
-    h1, h2, h3, p, .qTitle, .introTitle {
-      word-break: keep-all;
-      letter-spacing: -0.02em;
-    }
-    .introTitle {
-      font-size: 26px !important;
-      margin-bottom: 12px;
-      line-height: 1.3;
-      color: #111;
-    }
-    .introDesc {
-      font-size: 16px;
-      color: #666;
-      line-height: 1.6;
-    }
-
-    /* 6. 이미지 박스 & 결과 칩 */
+    /* 7. 이미지 박스 & 유틸리티 */
     .illusBox {
-      border: none !important;
-      background: #f8f9fa !important; /* 이미지가 없을 때 아주 연한 회색 */
+      background: #f8f9fa !important;
       border-radius: 16px;
-      margin: 0 16px; /* 좌우 여백 */
-      width: auto !important; /* 꽉 차지 않게 */
-      aspect-ratio: 16/9; /* 비율 유지 */
-    }
-    .chips { gap: 8px; }
-    .chip {
-      background: #f1f3f5 !important;
+      margin: 0 20px;
+      aspect-ratio: 16/9;
       border: none !important;
-      color: #495057 !important;
-      font-weight: 600;
-      border-radius: 8px !important;
-      padding: 6px 10px !important;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    
-    /* 숨김 처리 */
+    /* 이미지가 없으면 아예 숨김 (깔끔하게) */
+    img[src=""], img:not([src]) { display: none; } 
     .illusFallback { display: none !important; }
-    .uidNote { display: none; }
+
+    /* 8. 중앙 정렬 강화 (요청하신 부분) */
+    .text-center { text-align: center !important; }
+    .flex-center { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+    
+    /* 텍스트 줄바꿈 방지 */
+    h1, h2, h3, p { word-break: keep-all; letter-spacing: -0.02em; }
+    
+    /* 결과 페이지 박스 스타일 */
+    .result-box {
+      background: #f8f9fa;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 12px;
+      text-align: center; /* 박스 내부 중앙 정렬 */
+    }
+    .chips { justify-content: center; } /* 칩 가운데 정렬 */
+    .chip {
+      background: #fff !important;
+      border: 1px solid #dee2e6 !important;
+      color: #495057 !important;
+      border-radius: 8px !important;
+      padding: 6px 12px !important;
+      font-size: 14px;
+      font-weight: 600;
+    }
   </style>
 </head>
 
@@ -161,18 +161,23 @@
         <div id="viewIntro" class="view is-active">
           <header class="brandRow">
             <button class="iconBtn" type="button" aria-label="뒤로" disabled>←</button>
-            <div class="brandRow__title">
-              <div class="brandRow__brand">장보기 성향 테스트</div>
-            </div>
+            <div class="brandRow__brand">장보기 성향 테스트</div>
+            <div style="position:absolute; right:20px; font-size:14px; font-weight:700; color:#adb5bd;"></div>
           </header>
+
+          <div class="progressBarContainer">
+            <div class="progressBar">
+              <div class="progressBar__fill" style="width: 0%;"></div>
+            </div>
+          </div>
 
           <div class="illusBox">
             <img id="introImage" alt="" style="width:100%; height:100%; object-fit:contain;" onerror="this.style.display='none';" />
           </div>
 
-          <div class="introCopy" style="padding: 24px 20px;">
-            <h1 class="introTitle">1분 만에 끝나는<br>장보기 MBTI 테스트</h1>
-            <p class="introDesc">
+          <div class="introCopy" style="padding: 30px 20px; text-align: center;">
+            <h1 class="introTitle" style="font-size: 26px; margin-bottom: 12px; color: #111;">1분 만에 끝나는<br>장보기 MBTI 테스트</h1>
+            <p class="introDesc" style="font-size: 16px; color: #666; line-height: 1.6;">
               자주 가는 마트에서<br />
               “나에게 딱 맞는 추천”을 찾아드려요.
             </p>
@@ -184,26 +189,25 @@
           </div>
         </div>
 
+
         <div id="viewQuiz" class="view">
           <header class="brandRow">
             <button id="btnPrev" class="iconBtn" type="button" aria-label="이전">←</button>
-            <div class="brandRow__title">
-              <div class="brandRow__brand" id="quizTitleTop">질문</div>
-            </div>
-            <div style="position:absolute; right:20px; top:50%; transform:translateY(-50%); font-size:14px; font-weight:700; color:#adb5bd;">
-              <span id="progressLabel">1 / 9</span>
+            <div class="brandRow__brand">질문</div>
+            <div style="position:absolute; right:20px;">
+              <span id="progressLabel" class="progressTiny">1 / 9</span>
             </div>
           </header>
 
-          <div style="padding: 0 20px;">
-            <div class="progressBar" role="progressbar" aria-valuemin="0" aria-valuemax="9" aria-valuenow="1" style="height:6px; background:#f1f3f5; border:none;">
-              <div id="barFill" class="progressBar__fill" style="background: linear-gradient(90deg, #FF6B6B, #FF8E53);"></div>
+          <div class="progressBarContainer">
+            <div class="progressBar">
+              <div id="barFill" class="progressBar__fill" style="width: 10%;"></div>
             </div>
           </div>
 
-          <div class="questionBlock" style="margin-top:20px;">
-            <h2 id="qTitle" class="qTitle" style="font-size:22px;">질문 제목</h2>
-            <p id="qHint" class="qHint" style="font-size:15px; color:#868e96; margin-top:8px;">힌트 문구</p>
+          <div class="questionBlock" style="margin-top:10px; text-align: center;">
+            <h2 id="qTitle" class="qTitle" style="font-size:22px; margin-bottom:8px;">질문 제목</h2>
+            <p id="qHint" class="qHint" style="font-size:15px; color:#868e96;">힌트 문구</p>
           </div>
 
           <div class="illusBox" style="margin-top: 10px;">
@@ -213,15 +217,20 @@
           <div id="choices" class="choicePills" style="padding: 20px;"></div>
         </div>
 
+
         <div id="viewResult" class="view">
           <header class="brandRow">
             <button id="btnBackFromResult" class="iconBtn" type="button" aria-label="처음으로">←</button>
-            <div class="brandRow__title">
-              <div class="brandRow__brand">테스트 결과</div>
-            </div>
+            <div class="brandRow__brand">테스트 결과</div>
           </header>
 
-          <div class="resultHead" style="padding: 20px 20px 0;">
+          <div class="progressBarContainer">
+            <div class="progressBar">
+              <div class="progressBar__fill" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <div class="resultHead" style="padding: 20px; text-align: center;">
             <div class="resultBadgeLine" style="margin-bottom:12px;">
               <span id="resultBadge" style="background:#fff0f6; color:#c02b5e; padding:4px 8px; border-radius:6px; font-size:12px; font-weight:700;">MY TYPE</span>
               <span id="resultCodeText" style="display:none;"></span>
@@ -235,29 +244,29 @@
             </p>
           </div>
 
-          <div class="illusBox illusBox--portrait" style="background:transparent !important; margin-top:10px;">
+          <div class="illusBox illusBox--portrait" style="background:transparent !important;">
             <img id="resultImage" alt="" style="width:100%; border-radius:16px;" onerror="this.style.display='none';" />
           </div>
 
           <div class="card__body stack" style="padding:20px;">
-            <div class="box" style="border:none; background:#f8f9fa; border-radius:16px; padding:16px;">
-              <h3 class="h3" style="font-size:16px;">👍 이런 점이 좋아요</h3>
-              <div id="strengthChips" class="chips"></div>
+            <div class="result-box">
+              <h3 class="h3" style="font-size:16px; margin-bottom:10px;">👍 이런 점이 좋아요</h3>
+              <div id="strengthChips" class="flex-center chips"></div>
             </div>
 
-            <div class="box" style="border:none; background:#f8f9fa; border-radius:16px; padding:16px;">
-              <h3 class="h3" style="font-size:16px;">⚠️ 이건 좀 주의해요</h3>
-              <div id="riskChips" class="chips"></div>
+            <div class="result-box">
+              <h3 class="h3" style="font-size:16px; margin-bottom:10px;">⚠️ 이건 좀 주의해요</h3>
+              <div id="riskChips" class="flex-center chips"></div>
             </div>
 
-            <div class="box" style="border:none; background:#f8f9fa; border-radius:16px; padding:16px;">
-              <h3 class="h3" style="font-size:16px;">🛒 추천 코너</h3>
-              <div id="sectionChips" class="chips"></div>
+            <div class="result-box">
+              <h3 class="h3" style="font-size:16px; margin-bottom:10px;">🛒 추천 코너</h3>
+              <div id="sectionChips" class="flex-center chips"></div>
             </div>
 
-            <div class="box" style="border:none; background:#f8f9fa; border-radius:16px; padding:16px;">
-              <h3 class="h3" style="font-size:16px;">🛍️ 예상 장바구니</h3>
-              <div id="basketChips" class="chips"></div>
+            <div class="result-box">
+              <h3 class="h3" style="font-size:16px; margin-bottom:10px;">🛍️ 예상 장바구니</h3>
+              <div id="basketChips" class="flex-center chips"></div>
             </div>
             
             <div id="weightGrid" class="weights" style="display:none;"></div>
@@ -286,5 +295,23 @@
   <script src="./assets/js/data.js"></script>
   <script src="./assets/js/quiz.js"></script>
   <script src="./assets/js/main.js"></script>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const btnBack = document.getElementById("btnBackFromResult");
+      if(btnBack) {
+        btnBack.addEventListener("click", () => {
+          // 퀴즈 상태를 리셋하고 인트로 화면으로 이동
+          if(window.Quiz && window.Quiz.showIntro) {
+            window.Quiz.showIntro();
+            // URL 해시 제거 (선택사항)
+            history.replaceState(null, "", location.pathname + location.search);
+          } else {
+            location.reload(); // 만약 로직이 꼬이면 새로고침
+          }
+        });
+      }
+    });
+  </script>
 </body>
 </html>
