@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#ff7a00" />
+  <meta name="theme-color" content="#ffffff" />
   <title>장보기 MBTI 테스트</title>
 
   <link rel="stylesheet" href="./assets/css/base.css" />
@@ -12,12 +12,11 @@
 </head>
 
 <body>
-  <div class="appShell">
-    <main class="appMain">
-      <section class="card card--center" aria-live="polite">
+  <div class="app">
+    <main class="stage">
+      <section class="card" aria-live="polite">
 
-        <!-- INTRO -->
-          <div id="viewIntro" class="view is-active">
+        <div id="viewIntro" class="view is-active">
           <div class="topline"></div>
 
           <header class="brandRow">
@@ -31,9 +30,9 @@
             </div>
           </header>
 
-          <div class="illusBox illusBox--wide" aria-hidden="true">
-            <img id="introImage" alt="" />
-            <div class="illusFallback">
+          <div class="illusBox illusBox--wide" style="background-color: #ffffff;" aria-hidden="true">
+            <img id="introImage" alt="" onerror="this.style.display='none';" />
+            <div class="illusFallback" style="display:none;">
               <div class="illusFallback__title">INTRO IMAGE</div>
               <div class="illusFallback__desc">assets/img/intro/intro.png</div>
             </div>
@@ -58,7 +57,6 @@
           </p>
         </div>
 
-        <!-- QUIZ -->
         <div id="viewQuiz" class="view">
           <div class="topline"></div>
 
@@ -77,9 +75,9 @@
             <div id="barFill" class="progressBar__fill"></div>
           </div>
 
-          <div class="illusBox illusBox--wide">
-            <img id="qImage" alt="" />
-            <div id="qImageFallback" class="illusFallback">
+          <div class="illusBox illusBox--wide" style="background-color: #ffffff;">
+            <img id="qImage" alt="" onerror="this.style.display='none';" />
+            <div id="qImageFallback" class="illusFallback" style="display:none;">
               <div class="illusFallback__title">QUESTION IMAGE</div>
               <div class="illusFallback__desc">assets/img/questions/q01.png</div>
             </div>
@@ -93,7 +91,6 @@
           <div id="choices" class="choicePills" aria-label="선택지"></div>
         </div>
 
-        <!-- RESULT -->
         <div id="viewResult" class="view">
           <div class="topline"></div>
 
@@ -110,7 +107,7 @@
 
           <div class="resultHead">
             <div class="resultBadgeLine">
-              <span class="badge">나의 타입</span>
+              <span id="resultBadge" class="badge">나의 타입</span>
               <span id="resultCodeText" class="codePill">PVE</span>
             </div>
 
@@ -122,14 +119,36 @@
             </p>
           </div>
 
-          <div class="illusBox illusBox--portrait">
-            <img id="resultImage" alt="" />
-            <div id="resultImageFallback" class="illusFallback">
+          <div class="illusBox illusBox--portrait" style="background-color: #ffffff;">
+            <img id="resultImage" alt="" onerror="this.style.display='none';" />
+            <div id="resultImageFallback" class="illusFallback" style="display:none;">
               <div class="illusFallback__title">RESULT IMAGE</div>
               <div class="illusFallback__desc">assets/img/results/PVE.png</div>
             </div>
           </div>
 
+          <div class="card__body stack">
+            <div class="box">
+              <h3 class="h3">이런 점이 좋아요</h3>
+              <div id="strengthChips" class="chips"></div>
+            </div>
+            <div class="box">
+              <h3 class="h3">이건 좀 주의해요</h3>
+              <div id="riskChips" class="chips"></div>
+            </div>
+            <div class="box">
+              <h3 class="h3">추천 코너</h3>
+              <div id="sectionChips" class="chips"></div>
+            </div>
+            <div class="box">
+              <h3 class="h3">예상 장바구니</h3>
+              <div id="basketChips" class="chips"></div>
+            </div>
+            <div class="box">
+              <h3 class="h3">성향 분석표</h3>
+              <div id="weightGrid" class="weights"></div>
+            </div>
+          </div>
           <div class="resultActions">
             <div class="saveHint">꼭 눌러 이미지 저장하기</div>
             <div class="actions actions--stack">
@@ -148,7 +167,6 @@
     </main>
   </div>
 
-  <!-- JS (모듈화 유지 / 순서 중요) -->
   <script src="./assets/js/config.js"></script>
   <script src="./assets/js/utils.js"></script>
   <script src="./assets/js/supabase.js"></script>
