@@ -9,6 +9,38 @@
   <link rel="stylesheet" href="./assets/css/base.css" />
   <link rel="stylesheet" href="./assets/css/layout.css" />
   <link rel="stylesheet" href="./assets/css/components.css" />
+
+  <style>
+    /* 1. 뒤로가기 버튼 왼쪽 최상단 고정 & 제목 줄바꿈 방지 */
+    .brandRow {
+      position: relative; /* 버튼 배치를 위한 기준점 */
+      justify-content: center; /* 제목은 중앙 정렬 */
+    }
+    .brandRow .iconBtn {
+      position: absolute;
+      left: 6px; /* 왼쪽 벽에 붙임 */
+      top: 50%;
+      transform: translateY(-50%); /* 세로 중앙 정렬 */
+      z-index: 10;
+    }
+    .brandRow__title {
+      word-break: keep-all; /* 단어 중간에서 줄바꿈 방지 */
+      text-align: center;
+      width: 70%; /* 제목 영역 확보 */
+    }
+    
+    /* 2. 이미지가 없을 때 보이는 지저분한 텍스트 숨김 */
+    .illusFallback { display: none !important; }
+    
+    /* 3. 이미지 박스 깔끔하게 (흰색 배경) */
+    .illusBox {
+      background-color: #ffffff !important; 
+      border-bottom: 1px solid var(--line);
+    }
+    
+    /* 4. 결과 페이지 데이터 박스 간격 */
+    .result-data-box { margin-bottom: 12px; }
+  </style>
 </head>
 
 <body>
@@ -25,35 +57,31 @@
               <div class="brandRow__kicker">나의 장보기 성향은?</div>
               <div class="brandRow__brand">장보기 MBTI 테스트</div>
             </div>
-            <div class="brandRow__right">
+            <div class="brandRow__right" style="position:absolute; right:16px;">
               <span class="progressTiny">1 / 9</span>
             </div>
           </header>
 
-          <div class="illusBox illusBox--wide" style="background-color: #ffffff;" aria-hidden="true">
+          <div class="illusBox illusBox--wide">
             <img id="introImage" alt="" onerror="this.style.display='none';" />
-            <div class="illusFallback" style="display:none;">
-              <div class="illusFallback__title">INTRO IMAGE</div>
-              <div class="illusFallback__desc">assets/img/intro/intro.png</div>
-            </div>
           </div>
 
           <div class="introCopy">
-            <h1 class="introTitle">1분만에 끝나는 장보기 성향 테스트</h1>
+            <h1 class="introTitle" style="word-break: keep-all;">1분만에 끝나는<br>장보기 성향 테스트</h1>
             <p class="introDesc">
               이미 매칭된 마트 기준으로<br />
               “무엇을 먼저 추천받아야 할지”를 찾아드려요.
             </p>
-            <p id="uidNote" class="uidNote"></p>
+            <p id="uidNote" class="uidNote" style="display:none;"></p>
           </div>
 
           <div class="actions actions--stack">
             <button id="btnStart" class="btn btn--pillPrimary" type="button">테스트 시작!</button>
-            <button id="btnDemo" class="btn btn--pillGhost" type="button">(데모) 바로 결과 보기</button>
+            <button id="btnDemo" class="btn btn--pillGhost" type="button" style="display:none;">(데모) 바로 결과 보기</button> 
           </div>
 
           <p class="footNote">
-            * 본 테스트는 재미/추천 최적화를 위한 성향 분류이며, 실제 상품 구성은 매장별로 달라질 수 있어요.
+            * 본 테스트는 재미/추천 최적화를 위한 성향 분류이며,<br>실제 상품 구성은 매장별로 달라질 수 있어요.
           </p>
         </div>
 
@@ -62,11 +90,13 @@
 
           <header class="brandRow">
             <button id="btnPrev" class="iconBtn" type="button" aria-label="이전">←</button>
+            
             <div class="brandRow__title">
               <div class="brandRow__kicker">장보기 MBTI 테스트</div>
               <div class="brandRow__brand" id="quizTitleTop">질문</div>
             </div>
-            <div class="brandRow__right">
+            
+            <div class="brandRow__right" style="position:absolute; right:16px;">
               <span id="progressLabel" class="progressTiny">1 / 9</span>
             </div>
           </header>
@@ -75,17 +105,13 @@
             <div id="barFill" class="progressBar__fill"></div>
           </div>
 
-          <div class="illusBox illusBox--wide" style="background-color: #ffffff;">
+          <div class="illusBox illusBox--wide">
             <img id="qImage" alt="" onerror="this.style.display='none';" />
-            <div id="qImageFallback" class="illusFallback" style="display:none;">
-              <div class="illusFallback__title">QUESTION IMAGE</div>
-              <div class="illusFallback__desc">assets/img/questions/q01.png</div>
-            </div>
           </div>
 
           <div class="questionBlock">
-            <h2 id="qTitle" class="qTitle">질문 제목</h2>
-            <p id="qHint" class="qHint">힌트 문구</p>
+            <h2 id="qTitle" class="qTitle" style="word-break: keep-all;">질문 제목</h2>
+            <p id="qHint" class="qHint" style="word-break: keep-all;">힌트 문구</p>
           </div>
 
           <div id="choices" class="choicePills" aria-label="선택지"></div>
@@ -100,7 +126,7 @@
               <div class="brandRow__kicker">나의 장보기 성향은?</div>
               <div class="brandRow__brand">테스트 결과</div>
             </div>
-            <div class="brandRow__right">
+            <div class="brandRow__right" style="position:absolute; right:16px;">
               <span class="progressTiny">완료</span>
             </div>
           </header>
@@ -108,49 +134,49 @@
           <div class="resultHead">
             <div class="resultBadgeLine">
               <span id="resultBadge" class="badge">나의 타입</span>
-              <span id="resultCodeText" class="codePill">PVE</span>
+              <span id="resultCodeText" class="codePill">CODE</span>
             </div>
 
-            <h2 id="resultTitle" class="resultTitle">타입명</h2>
-            <p id="resultOne" class="resultOne">한 줄 소개</p>
+            <h2 id="resultTitle" class="resultTitle" style="word-break: keep-all;">타입명</h2>
+            <p id="resultOne" class="resultOne" style="word-break: keep-all;">한 줄 소개</p>
 
             <p id="resultRateText" class="resultRate">
               전체 테스트 참여자 중 <b>00.00%</b>가 같은 유형입니다.
             </p>
           </div>
 
-          <div class="illusBox illusBox--portrait" style="background-color: #ffffff;">
+          <div class="illusBox illusBox--portrait">
             <img id="resultImage" alt="" onerror="this.style.display='none';" />
-            <div id="resultImageFallback" class="illusFallback" style="display:none;">
-              <div class="illusFallback__title">RESULT IMAGE</div>
-              <div class="illusFallback__desc">assets/img/results/PVE.png</div>
-            </div>
           </div>
 
           <div class="card__body stack">
-            <div class="box">
+            <div class="box result-data-box">
               <h3 class="h3">이런 점이 좋아요</h3>
               <div id="strengthChips" class="chips"></div>
             </div>
-            <div class="box">
+
+            <div class="box result-data-box">
               <h3 class="h3">이건 좀 주의해요</h3>
               <div id="riskChips" class="chips"></div>
             </div>
-            <div class="box">
+
+            <div class="box result-data-box">
               <h3 class="h3">추천 코너</h3>
               <div id="sectionChips" class="chips"></div>
             </div>
-            <div class="box">
+
+            <div class="box result-data-box">
               <h3 class="h3">예상 장바구니</h3>
               <div id="basketChips" class="chips"></div>
             </div>
-            <div class="box">
+
+            <div class="box result-data-box">
               <h3 class="h3">성향 분석표</h3>
               <div id="weightGrid" class="weights"></div>
             </div>
           </div>
           <div class="resultActions">
-            <div class="saveHint">꼭 눌러 이미지 저장하기</div>
+            <div class="saveHint">결과 화면을 캡처해서 저장해보세요!</div>
             <div class="actions actions--stack">
               <button id="btnCopy" class="btn btn--pillPrimary" type="button">링크 복사</button>
               <button id="btnSave" class="btn btn--pillGhost" type="button">내 타입 저장</button>
