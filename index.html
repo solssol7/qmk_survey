@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>식자재마트 장보기 성향 테스트</title>
+  <meta name="description" content="같은 마트여도 추천은 달라야 한다. 내 장보기 타입을 1분만에!" />
+
+  <link rel="stylesheet" href="./assets/css/base.css" />
+  <link rel="stylesheet" href="./assets/css/layout.css" />
+  <link rel="stylesheet" href="./assets/css/components.css" />
+</head>
+<body>
+  <!-- 배경(장보기 느낌 패턴) -->
+  <div class="bg" aria-hidden="true"></div>
+
+  <!-- 중앙 메인 컨테이너 -->
+  <main class="app" role="main">
+    <div class="shell">
+      <!-- 상단은 '작게' 보조 정보만 -->
+      <header class="topbar" aria-label="상단 정보">
+        <div class="brand">
+          <div class="brand__title">장보기 성향 테스트</div>
+          <div class="brand__sub">크고 선명하게 · 2지선다</div>
+        </div>
+        <div class="pill" id="pill">v1</div>
+      </header>
+
+      <!-- 중앙 카드(여기가 항상 화면 중앙) -->
+      <section class="stage">
+        <div class="card" id="cardRoot">
+          <!-- INTRO -->
+          <section class="view is-active" id="viewIntro" aria-label="인트로">
+            <div class="card__head">
+              <h1 class="h1">
+                내 장보기는<br />
+                “행사파 vs 재구매파 vs 신상파” 중 뭐지?
+              </h1>
+              <p class="p">
+                이미 매칭된 마트 안에서 <b>무엇을 먼저 추천받아야</b> 장바구니가 편해지는지 알아보는 테스트예요.
+                (약 1분)
+              </p>
+            </div>
+
+            <div class="card__body stack">
+              <div class="note">
+                <b>결과로 달라지는 것</b><br />
+                추천 섹션 순서(특가/인기/신상/구매이력) · 정렬/표시(배지) · 내 타입 저장
+              </div>
+              <div class="note" id="uidNote">user_id 확인 중…</div>
+            </div>
+
+            <div class="card__foot actions">
+              <button class="btn btn--primary" id="btnStart">테스트 시작</button>
+              <button class="btn btn--ghost" id="btnDemo">결과 예시</button>
+            </div>
+          </section>
+
+          <!-- QUIZ -->
+          <section class="view" id="viewQuiz" aria-label="퀴즈">
+            <div class="card__head">
+              <div class="progressRow">
+                <div class="progressText" id="progressLabel">질문 1 / 9</div>
+                <div class="pill pill--mono">2지선다</div>
+              </div>
+              <div class="progressBar" aria-label="진행률">
+                <i id="barFill"></i>
+              </div>
+            </div>
+
+            <div class="card__body quizBody">
+              <h2 class="h2" id="qTitle">질문</h2>
+              <p class="p p--muted" id="qHint">힌트</p>
+
+              <div class="choices" id="choices"></div>
+            </div>
+
+            <div class="card__foot actions actions--split">
+              <button class="btn btn--ghost" id="btnPrev">이전</button>
+              <button class="btn btn--danger" id="btnRestart">처음부터</button>
+            </div>
+          </section>
+
+          <!-- RESULT -->
+          <section class="view" id="viewResult" aria-label="결과">
+            <div class="card__head resultHead">
+              <div class="badge" id="resultBadge">결과</div>
+              <h2 class="h1" id="resultTitle">결과</h2>
+              <p class="p" id="resultOne">한 줄 소개</p>
+
+              <div class="share">
+                <input class="input" id="shareUrl" readonly />
+                <div class="share__btns">
+                  <button class="btn btn--ghost" id="btnCopy">링크 복사</button>
+                  <button class="btn btn--secondary" id="btnSave">내 타입 저장</button>
+                </div>
+              </div>
+
+              <p class="p p--muted p--small">
+                “내 타입 저장”을 누르면 추천에 반영할 수 있도록 서버에 저장돼요.
+              </p>
+            </div>
+
+            <div class="card__body stack">
+              <div class="box">
+                <h3 class="h3">이 타입의 장점(추천이 잘 맞는 이유)</h3>
+                <div class="chips" id="strengthChips"></div>
+              </div>
+
+              <div class="box">
+                <h3 class="h3">주의사항(장바구니가 무너지는 순간)</h3>
+                <div class="chips" id="riskChips"></div>
+              </div>
+
+              <div class="box">
+                <h3 class="h3">추천 가중치(서비스 내부용)</h3>
+                <p class="p p--muted p--small">값이 높을수록 해당 요소를 더 강하게 반영(0~3)</p>
+                <div class="weights" id="weightGrid"></div>
+              </div>
+
+              <div class="box">
+                <h3 class="h3">먼저 보여줄 추천 섹션</h3>
+                <div class="chips" id="sectionChips"></div>
+              </div>
+
+              <div class="box">
+                <h3 class="h3">장바구니 예시</h3>
+                <div class="chips" id="basketChips"></div>
+              </div>
+            </div>
+
+            <div class="card__foot actions">
+              <button class="btn btn--ghost" id="btnRetake">다시 하기</button>
+              <button class="btn btn--ghost" id="btnExplain">점수/로직</button>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <div class="toast" id="toast" role="status" aria-live="polite">저장했어요</div>
+    </div>
+  </main>
+
+  <!-- JS 모듈 로드(의존 순서 중요) -->
+  <script src="./assets/js/config.js"></script>
+  <script src="./assets/js/utils.js"></script>
+  <script src="./assets/js/supabase.js"></script>
+  <script src="./assets/js/data.js"></script>
+  <script src="./assets/js/quiz.js"></script>
+  <script src="./assets/js/main.js"></script>
+</body>
+</html>
