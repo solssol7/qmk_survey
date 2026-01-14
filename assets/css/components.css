@@ -1,196 +1,468 @@
+/* =========================================================
+   components.css (FULL)
+   Theme: Orange (high-contrast, middle-age friendly)
+   Layout target: SoBTI-like mobile survey UI
+   ========================================================= */
+
+/* ---------- Theme tokens (use with base/layout) ---------- */
+:root{
+  --paper: #ffffff;
+  --ink: #111827;
+  --muted: #4b5563;
+  --line: #e5e7eb;
+
+  /* Orange theme */
+  --brand: #f97316;        /* main orange */
+  --brand-dark: #ea580c;   /* pressed/darker */
+  --brand-soft: #fff7ed;   /* background tint */
+  --brand-line: #fed7aa;   /* soft border */
+
+  /* Secondary accents */
+  --blue: #2563eb;
+  --green: #16a34a;
+
+  /* Radius & sizes */
+  --r12: 12px;
+  --r16: 16px;
+  --r20: 20px;
+  --pill: 999px;
+
+  --btnH: 64px;
+}
+
+/* ---------- Card sections ---------- */
+.card__head{
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(90deg, var(--brand-soft), #ffffff);
+}
+
+.card__body{
+  padding: 16px;
+}
+
+.card__foot{
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--line);
+  background: #fff;
+}
+
+/* ---------- Typography helpers ---------- */
+.h1{
+  margin: 0 0 10px;
+  font-size: 26px;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  font-weight: 900;
+  color: var(--ink);
+}
+.h2{
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  font-weight: 900;
+  color: var(--ink);
+}
+.h3{
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.p{
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink);
+}
+.p--muted{ color: var(--muted); }
+.p--small{ font-size: 14px; }
+
+/* ---------- Simple layout helpers ---------- */
+.stack{ display: grid; gap: 12px; }
+.center{ text-align: center; }
+
+/* ---------- Top header (SoBTI-like) ---------- */
+/* 상단 얇은 줄(협업 로고/뒤로가기/우측 진행도) */
+.topline{
+  height: 44px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 0 14px;
+  background:#fff;
+  border-bottom:1px solid var(--line);
+  font-size:14px;
+  color: var(--ink);
+}
+.topline__left,
+.topline__right{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.topline__btn{
+  border:0;
+  background:transparent;
+  font-size:16px;
+  font-weight:900;
+  padding: 8px 10px;
+  border-radius: var(--r12);
+  cursor:pointer;
+}
+.topline__btn:active{ background: #f3f4f6; }
+
+/* 가운데 타이틀(소BTI 테스트처럼) */
+.brandRow{
+  height: 56px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+  color: var(--brand);
+  background: #fff;
+  border-bottom: 3px solid var(--brand-line);
+}
+.progressRight{
+  font-weight:900;
+  color: var(--ink);
+}
+
+/* 작은 칩 */
 .pill{
-    font-size:12px;
-    padding:8px 10px;
-    border:1px solid var(--line);
-    border-radius:999px;
-    background:rgba(255,255,255,.85);
-    white-space:nowrap;
-  }
-  .pill--mono{font-family:var(--mono)}
-  
-  .card__head{
-    padding:18px;
-    border-bottom:1px solid var(--line);
-    background:
-      linear-gradient(90deg, rgba(29,78,216,.08), rgba(225,29,72,.08));
-  }
-  .card__body{padding:18px}
-  .card__foot{
-    padding:16px 18px 18px;
-    border-top:1px solid var(--line);
-    background:#fff;
-  }
-  
-  .h1{margin:0 0 10px; font-size:28px; line-height:1.18; letter-spacing:-.03em; font-weight:950}
-  .h2{margin:0; font-size:22px; line-height:1.25; letter-spacing:-.02em; font-weight:950}
-  .h3{margin:0 0 10px; font-size:16px; font-weight:950}
-  .p{margin:0; font-size:15px; line-height:1.7}
-  .p--muted{color:var(--muted)}
-  .p--small{font-size:14px}
-  
-  .stack{display:grid; gap:12px}
-  
-  .note{
-    border:1px solid var(--line);
-    border-radius:14px;
-    padding:14px;
-    background:#fff;
-    color:var(--muted);
-    font-size:15px;
-    line-height:1.6;
-  }
-  
-  .actions{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-  }
-  .actions--split .btn{flex:1}
-  
-  .btn{
-    height:68px;
-    padding:0 16px;
-    border-radius:16px;
-    font-weight:950;
-    font-size:16px;
-    border:0;
-    cursor:pointer;
-    user-select:none;
-  }
-  .btn:active{transform:translateY(1px)}
-  .btn--primary{background:var(--red); color:#fff}
-  .btn--secondary{background:var(--blue); color:#fff}
-  .btn--ghost{background:#fff; border:2px solid var(--ink); color:var(--ink)}
-  .btn--danger{background:#fff; border:2px solid var(--red); color:var(--red)}
-  
-  .progressRow{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    margin-bottom:10px;
-  }
-  .progressText{font-size:14px; color:var(--muted)}
-  .progressBar{
-    height:14px;
-    background:#eef2ff;
-    border:1px solid var(--line);
-    border-radius:999px;
-    overflow:hidden;
-  }
-  .progressBar > i{
-    display:block;
-    height:100%;
-    width:0%;
-    background: linear-gradient(90deg, var(--green), var(--yellow));
-    border-radius:999px;
-    transition: width .18s ease;
-  }
-  
-  .quizBody{display:grid; gap:12px}
-  .choices{display:grid; gap:12px; margin-top:10px}
-  .choice{
-    text-align:left;
-    border-radius:16px;
-    border:2px solid var(--ink);
-    background:#fff;
-    padding:16px;
-    min-height:78px;
-    cursor:pointer;
-  }
-  .choice:active{background:#f8fafc}
-  .choice__main{font-weight:950; font-size:17px; margin-bottom:6px}
-  .choice__sub{color:var(--muted); font-size:14px; line-height:1.35}
-  
-  .box{
-    border:1px solid var(--line);
-    border-radius:16px;
-    padding:14px;
-    background:#fff;
-  }
-  .chips{display:flex; flex-wrap:wrap; gap:8px}
-  .chip{
-    padding:9px 12px;
-    border-radius:999px;
-    border:1px solid var(--line);
-    background:#f8fafc;
-    font-size:14px;
-    white-space:nowrap;
-  }
-  
-  .weights{
-    display:grid;
-    grid-template-columns:repeat(2, 1fr);
-    gap:10px;
-  }
-  .w{
-    border:1px solid var(--line);
-    border-radius:14px;
-    padding:12px;
-    display:flex;
-    justify-content:space-between;
-    gap:10px;
-    background:#fff;
-    font-size:14px;
-  }
-  .w strong{font-family:var(--mono)}
-  
-  .badge{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    padding:8px 10px;
-    border-radius:999px;
-    border:1px solid var(--ink);
-    background:#fff;
-    font-size:12px;
-    font-family:var(--mono);
-  }
-  
-  .share{display:grid; gap:10px; margin-top:12px}
-  .input{
-    width:100%;
-    height:52px;
-    border-radius:14px;
-    border:2px solid var(--ink);
-    background:#fff;
-    color:var(--ink);
-    padding:0 12px;
-    font-family:var(--mono);
-    font-size:12px;
-  }
-  .share__btns{display:flex; gap:10px; flex-wrap:wrap}
-  .share__btns .btn{flex:1; min-width:160px; height:60px}
-  
-  .toast{
-    position:fixed;
-    left:50%;
-    bottom: calc(18px + env(safe-area-inset-bottom));
-    transform:translateX(-50%);
-    background: #111827;
-    color:#fff;
-    padding:10px 12px;
-    border-radius:14px;
-    font-size:14px;
-    opacity:0;
-    pointer-events:none;
-    transition:opacity .16s ease, transform .16s ease;
-  }
-  .toast.is-show{
-    opacity:1;
-    transform:translateX(-50%) translateY(-6px);
-  }
-  
-  /* 작은 화면에서 카드가 너무 커지지 않도록 */
-  @media (max-width: 380px){
-    .h1{font-size:24px}
-    .btn{height:64px}
-  }
-  
-  /* 큰 화면에서 2열 선택지 */
-  @media (min-width: 760px){
-    .choices{grid-template-columns:1fr 1fr}
-    .weights{grid-template-columns:repeat(4, 1fr)}
-    .share{grid-template-columns:1fr 1fr; align-items:center}
-  }
-  
+  font-size: 12px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--pill);
+  background: #fff;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.pill--mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+/* ---------- Notes ---------- */
+.note{
+  border: 1px solid var(--line);
+  border-radius: var(--r16);
+  padding: 14px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+.note b{ color: var(--ink); font-weight: 900; }
+
+/* ---------- Progress bar ---------- */
+.progressRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+.progressText{
+  font-size:14px;
+  color: var(--muted);
+  font-weight: 800;
+}
+.progressBar{
+  height: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--pill);
+  overflow:hidden;
+}
+.progressBar > i{
+  display:block;
+  height:100%;
+  width:0%;
+  background: linear-gradient(90deg, var(--brand), #fb923c);
+  border-radius: var(--pill);
+  transition: width .18s ease;
+}
+
+/* ---------- Illustration / Image box ---------- */
+.illusBox{
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #f3f4f6;
+  border: 1px solid var(--line);
+  border-radius: 0; /* 예시 느낌: 직사각형 이미지 프레임 [Source](https://www.genspark.ai/api/files/s/gGBhjfNj) */
+  overflow: hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.illusBox--square{ aspect-ratio: 1 / 1; }
+.illusBox img{
+  width:100%;
+  height:100%;
+  object-fit: cover;
+  display:block;
+}
+
+/* ---------- Question block ---------- */
+.questionBlock{
+  text-align:center;
+  padding: 14px 10px 6px;
+}
+.questionBlock .qTitle{
+  margin:0;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.questionBlock .qSub{
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* ---------- Actions (buttons row) ---------- */
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.actions--split .btn{
+  flex:1;
+}
+
+/* ---------- Button base ---------- */
+.btn{
+  height: var(--btnH);
+  padding: 0 16px;
+  border-radius: var(--r16);
+  font-weight: 900;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  border: 0;
+  cursor: pointer;
+  user-select: none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+}
+.btn:active{ transform: translateY(1px); }
+
+/* 주황 Primary */
+.btn--primary{
+  background: var(--brand);
+  color: #fff;
+}
+.btn--primary:active{ background: var(--brand-dark); }
+
+/* 보조(짙은 테두리) */
+.btn--ghost{
+  background:#fff;
+  border: 2px solid var(--ink);
+  color: var(--ink);
+}
+.btn--ghost:active{ background:#f3f4f6; }
+
+/* Secondary(파랑) */
+.btn--secondary{
+  background: var(--blue);
+  color: #fff;
+}
+.btn--secondary:active{ filter: brightness(0.95); }
+
+/* Danger(테두리 주황/빨강 계열) */
+.btn--danger{
+  background:#fff;
+  border: 2px solid var(--brand-dark);
+  color: var(--brand-dark);
+}
+.btn--danger:active{ background: var(--brand-soft); }
+
+/* SoBTI-like big pill CTA */
+.btn--pillPrimary{
+  height: 64px;
+  border-radius: var(--pill);
+  background: var(--brand);
+  color:#fff;
+  font-size:18px;
+  font-weight: 900;
+  border: 3px solid #111; /* 예시의 굵은 외곽선 느낌을 원하면 유지 */
+}
+.btn--pillPrimary:active{
+  background: var(--brand-dark);
+}
+
+/* ---------- Choice pills (SoBTI-like) ---------- */
+.choicePills{
+  display:grid;
+  gap: 12px;
+  padding: 12px 14px 18px;
+}
+.choicePill{
+  width:100%;
+  min-height: 64px;
+  border-radius: var(--pill);
+  border: 1px solid var(--line);
+  background:#fff;
+  font-size:16px;
+  font-weight: 800;
+  padding: 14px 16px;
+  text-align:center;
+  cursor:pointer;
+  color: var(--ink);
+}
+.choicePill:active{
+  background: var(--brand-soft);
+  border-color: var(--brand-line);
+}
+
+/* 기존 구조(너희 코드)에서 쓰던 choice 카드도 주황 톤으로 유지 */
+.choices{
+  display:grid;
+  gap: 12px;
+  margin-top: 10px;
+}
+.choice{
+  text-align:left;
+  border-radius: var(--r16);
+  border: 2px solid var(--ink);
+  background: #fff;
+  padding: 16px;
+  min-height: 78px;
+  cursor: pointer;
+}
+.choice:active{ background: var(--brand-soft); }
+.choice__main{
+  font-weight: 900;
+  font-size: 17px;
+  margin-bottom: 6px;
+  color: var(--ink);
+}
+.choice__sub{
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+/* ---------- Result chips / boxes ---------- */
+.box{
+  border: 1px solid var(--line);
+  border-radius: var(--r16);
+  padding: 14px;
+  background: #fff;
+}
+.chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.chip{
+  padding: 9px 12px;
+  border-radius: var(--pill);
+  border: 1px solid var(--line);
+  background: #fff;
+  font-size: 14px;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+/* Weights */
+.weights{
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.w{
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  background:#fff;
+  font-size:14px;
+  color: var(--muted);
+}
+.w strong{
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* Badge */
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding: 8px 10px;
+  border-radius: var(--pill);
+  border: 1px solid var(--ink);
+  background:#fff;
+  font-size:12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* Share area */
+.share{
+  display:grid;
+  gap:10px;
+  margin-top:12px;
+}
+.input{
+  width: 100%;
+  height: 52px;
+  border-radius: 14px;
+  border: 2px solid var(--ink);
+  background:#fff;
+  color: var(--ink);
+  padding: 0 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+}
+.share__btns{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.share__btns .btn{
+  flex:1;
+  min-width: 160px;
+  height: 60px;
+}
+
+/* Toast */
+.toast{
+  position:fixed;
+  left:50%;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  background: #111827;
+  color:#fff;
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events:none;
+  transition: opacity .16s ease, transform .16s ease;
+}
+.toast.is-show{
+  opacity: 1;
+  transform: translateX(-50%) translateY(-6px);
+}
+
+/* ---------- Responsive tweaks ---------- */
+@media (max-width: 380px){
+  .h1{ font-size: 24px; }
+  .btn{ height: 62px; }
+  .choicePill{ min-height: 60px; font-size: 15px; }
+}
+
+@media (min-width: 760px){
+  .choices{ grid-template-columns: 1fr 1fr; }
+  .weights{ grid-template-columns: repeat(4, 1fr); }
+  .share{ grid-template-columns: 1fr 1fr; align-items:center; }
+}
