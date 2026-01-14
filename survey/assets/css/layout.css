@@ -1,0 +1,63 @@
+/* 배경 레이어 */
+.bg{
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    background:
+      linear-gradient(0deg, rgba(29,78,216,.07), rgba(29,78,216,.07)),
+      linear-gradient(90deg, rgba(225,29,72,.06), rgba(225,29,72,.06)),
+      repeating-linear-gradient(45deg,
+        rgba(245,158,11,.10) 0px,
+        rgba(245,158,11,.10) 10px,
+        rgba(255,255,255,0) 10px,
+        rgba(255,255,255,0) 20px
+      ),
+      radial-gradient(circle at 10% 15%, rgba(22,163,74,.12), transparent 42%),
+      radial-gradient(circle at 90% 10%, rgba(29,78,216,.12), transparent 40%);
+    background-blend-mode:multiply, multiply, normal, normal, normal;
+  }
+  
+  /* 앱 전체를 화면 가운데 정렬 */
+  .app{
+    min-height:100dvh;
+    display:grid;
+    place-items:center; /* 중앙 정렬 핵심 */
+    padding: calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));
+  }
+  
+  .shell{
+    width:100%;
+    max-width:var(--max);
+  }
+  
+  /* 상단은 작게 */
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    margin-bottom:12px;
+  }
+  .brand__title{font-weight:950; font-size:18px; letter-spacing:-.02em}
+  .brand__sub{font-size:14px; color:var(--muted)}
+  
+  /* 스테이지: 카드가 중앙에 오도록 */
+  .stage{
+    display:grid;
+    place-items:center;
+  }
+  
+  /* 카드 자체 */
+  .card{
+    width:min(720px, 100%);
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  
+  /* 뷰 전환 */
+  .view{display:none}
+  .view.is-active{display:block}
+  
