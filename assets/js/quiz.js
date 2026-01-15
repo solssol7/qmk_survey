@@ -10,6 +10,27 @@ window.Quiz = (() => {
     resultKey: null,
   };
 
+  // [핵심 기능 추가] 이미지 미리 로딩 (인트로 화면에서 미리 다운로드)
+  function preloadImages() {
+    // 1. 질문 이미지 미리 받기
+    QUESTIONS.forEach(q => {
+      if (q.image) {
+        const img = new Image();
+        img.src = q.image;
+      }
+    });
+    // 2. 결과 이미지 미리 받기
+    Object.values(TYPES).forEach(t => {
+      if (t.image) {
+        const img = new Image();
+        img.src = t.image;
+      }
+    });
+  }
+
+  // 이 스크립트가 실행되자마자 프리로딩 시작
+  preloadImages();
+
   function reset(){
     state.idx = 0;
     state.answers = [];
@@ -63,7 +84,7 @@ window.Quiz = (() => {
       }
     }
 
-    // 선택지 렌더링 (스타일 개선)
+    // 선택지 렌더링
     const root = $("choices");
     root.innerHTML = "";
 
@@ -72,8 +93,7 @@ window.Quiz = (() => {
       btn.className = "choicePill";
       btn.type = "button";
 
-      // [핵심 변경] innerHTML을 사용하여 줄바꿈 및 폰트 크기 조정
-      // main: 크게 / sub: 작게, 회색, 줄바꿈
+      // 텍스트 스타일 적용
       const mainHtml = `<span style="font-size:17px; font-weight:700; display:block; margin-bottom:4px;">${choice.main}</span>`;
       const subHtml = choice.sub 
         ? `<span style="font-size:13px; font-weight:400; color:#868e96; display:block;">${choice.sub}</span>` 
@@ -85,7 +105,6 @@ window.Quiz = (() => {
       root.appendChild(btn);
     });
 
-    // prev 버튼 상태
     const prevBtn = $("btnPrev");
     if(prevBtn){
       prevBtn.disabled = (state.idx === 0);
@@ -125,7 +144,6 @@ window.Quiz = (() => {
     renderQuestion();
   }
 
-  // 칩 생성 헬퍼
   function chip(text){
     const s = document.createElement("span");
     s.className = "chip";
@@ -164,13 +182,11 @@ window.Quiz = (() => {
     const share = $("shareUrl");
     if(share) share.value = location.href;
 
-    // Chips
     const strength = $("strengthChips"); if(strength){ strength.innerHTML = ""; t.strengths.forEach(x => strength.appendChild(chip(x))); }
     const risk = $("riskChips"); if(risk){ risk.innerHTML = ""; t.risks.forEach(x => risk.appendChild(chip(x))); }
     const sec = $("sectionChips"); if(sec){ sec.innerHTML = ""; t.sections.forEach(x => sec.appendChild(chip(x))); }
     const basket = $("basketChips"); if(basket){ basket.innerHTML = ""; t.basket.forEach(x => basket.appendChild(chip(x))); }
 
-    // 궁합 렌더링
     if(t.partners) {
       renderPartner("partnerBest", t.partners.best);
       renderPartner("partnerWorst", t.partners.worst);
