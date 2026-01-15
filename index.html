@@ -118,11 +118,12 @@
       background: #fff7ed !important;
     }
 
-    /* 이미지 박스 */
+    /* [수정] 이미지 박스 스타일 - width: auto로 변경하여 넘침 해결 */
     .illusBox {
       background: #f8f9fa !important;
       border-radius: 16px;
-      margin: 0 20px;
+      margin: 0 20px;       /* 양옆 여백 */
+      width: auto !important; /* [핵심] 100% 대신 auto를 써야 여백만큼 줄어듭니다 */
       aspect-ratio: 16/9;
       border: none !important;
       overflow: hidden;
@@ -265,7 +266,7 @@
             </p>
           </div>
 
-          <div class="illusBox illusBox--portrait" style="background:transparent !important;">
+          <div class="illusBox illusBox--portrait" style="background:transparent !important; aspect-ratio: auto !important; width: auto !important;">
             <img id="resultImage" alt="" style="width:100%; border-radius:16px;" onerror="this.style.display='none';" />
           </div>
 
