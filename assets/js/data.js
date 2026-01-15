@@ -86,7 +86,7 @@ window.QUIZ_DATA = (() => {
 
   const TYPES = {
     "PVE": {
-      name: "장보기 PM(프로젝트 매니저)",
+      name: "장보기 매니저",
       one: "필요한 것만 정확히, 빠르게 사는 타입이에요.",
       rate: 20.44,
       image: "./assets/img/results/PVE.webp", // [수정] .webp
@@ -122,7 +122,7 @@ window.QUIZ_DATA = (() => {
       partners: { best: "PQB", worst: "IVB" }
     },
     "PQB": {
-      name: "브랜드 충성 VIP",
+      name: "브랜드 VIP",
       one: "내가 좋아하는 브랜드는 대용량으로 쟁여요.",
       rate: 9.96,
       image: "./assets/img/results/PQB.webp", // [수정] .webp
@@ -146,7 +146,7 @@ window.QUIZ_DATA = (() => {
       partners: { best: "IVB", worst: "PQB" }
     },
     "IVB": {
-      name: "1+1에 인생 건다",
+      name: "1+1은 내인생",
       one: "묶음 할인만 보면 눈이 돌아가는 타입이에요.",
       rate: 8.71,
       image: "./assets/img/results/IVB.webp", // [수정] .webp
