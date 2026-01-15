@@ -1,6 +1,5 @@
 // assets/js/data.js
 window.QUIZ_DATA = (() => {
-  // 질문을 "평소 장보기 습관" 위주로 더 쉽고 직관적으로 변경했습니다.
   const QUESTIONS = [
     {
       title: "마트에 들어서는 순간 나는?",
@@ -85,7 +84,6 @@ window.QUIZ_DATA = (() => {
     }
   ];
 
-  // 8타입 결과 데이터 (기존 로직 유지)
   const TYPES = {
     "PVE": {
       name: "장보기 PM(프로젝트 매니저)",
@@ -96,7 +94,8 @@ window.QUIZ_DATA = (() => {
       risks: ["가끔은 충동구매의 재미도 필요해요", "너무 효율만 따지면 피곤할 수도?"],
       weights: { promo: 1, popular: 3, new: 0, history: 3 },
       sections: ["재구매 TOP", "필수템 요약", "구매이력 기반"],
-      basket: ["우유/두부", "계란", "양파/대파", "간편식", "냉동 기본", "생활용품"]
+      basket: ["우유/두부", "계란", "양파/대파", "간편식", "냉동 기본", "생활용품"],
+      partners: { best: "PVB", worst: "IQE" } // [추가] 궁합 데이터
     },
     "PVB": {
       name: "냉정한 단가 헌터",
@@ -107,7 +106,8 @@ window.QUIZ_DATA = (() => {
       risks: ["집이 창고가 될 수 있어요", "너무 많이 사서 유통기한 주의!"],
       weights: { promo: 3, popular: 2, new: 0, history: 1 },
       sections: ["오늘 특가", "묶음/대용량", "가성비 인기"],
-      basket: ["대용량 곡물", "냉동 대용량", "오일", "박스 라면", "세제", "대용량 소스"]
+      basket: ["대용량 곡물", "냉동 대용량", "오일", "박스 라면", "세제", "대용량 소스"],
+      partners: { best: "PVE", worst: "IQB" }
     },
     "PQE": {
       name: "깐깐한 미식가",
@@ -118,7 +118,8 @@ window.QUIZ_DATA = (() => {
       risks: ["장바구니 물가는 좀 비쌀지도?", "새로운 도전은 꺼리는 편"],
       weights: { promo: 1, popular: 3, new: 1, history: 2 },
       sections: ["인기·재구매", "검증 신상", "취향 기반"],
-      basket: ["유제품", "정육(소량)", "제철 과일", "요거트/치즈", "소스", "프리미엄 냉동"]
+      basket: ["유제품", "정육(소량)", "제철 과일", "요거트/치즈", "소스", "프리미엄 냉동"],
+      partners: { best: "PQB", worst: "IVB" }
     },
     "PQB": {
       name: "브랜드 충성 VIP",
@@ -129,7 +130,8 @@ window.QUIZ_DATA = (() => {
       risks: ["통장이 텅장 될 수 있음", "취향이 아니면 절대 안 삼"],
       weights: { promo: 1, popular: 2, new: 2, history: 3 },
       sections: ["내 취향", "취향 신상", "인기 프리미엄"],
-      basket: ["오일/버터", "정육 대용량", "좋은 소스", "커피/차", "치즈", "프리미엄 냉동"]
+      basket: ["오일/버터", "정육 대용량", "좋은 소스", "커피/차", "치즈", "프리미엄 냉동"],
+      partners: { best: "PQE", worst: "IVE" }
     },
     "IVE": {
       name: "세일코너 참새",
@@ -140,7 +142,8 @@ window.QUIZ_DATA = (() => {
       risks: ["안 사도 될 걸 살 때가 많음", "냉장고가 꽉 찰 수 있음"],
       weights: { promo: 3, popular: 2, new: 2, history: 0 },
       sections: ["오늘 행사", "급상승", "신상품"],
-      basket: ["행사 간식", "행사 소스", "할인 과일", "냉동 간편식", "즉석식", "한 번쯤"]
+      basket: ["행사 간식", "행사 소스", "할인 과일", "냉동 간편식", "즉석식", "한 번쯤"],
+      partners: { best: "IVB", worst: "PQB" }
     },
     "IVB": {
       name: "1+1에 인생 건다",
@@ -151,7 +154,8 @@ window.QUIZ_DATA = (() => {
       risks: ["다 먹느라 고생할 수 있음", "지출 관리가 필요해요"],
       weights: { promo: 3, popular: 2, new: 1, history: 0 },
       sections: ["1+1/묶음", "인기 행사", "가성비 TOP"],
-      basket: ["투팩 딜", "대용량 음료", "박스 간식", "냉동 대용량", "면류", "대용량 생활"]
+      basket: ["투팩 딜", "대용량 음료", "박스 간식", "냉동 대용량", "면류", "대용량 생활"],
+      partners: { best: "IVE", worst: "PQE" }
     },
     "IQE": {
       name: "신상 탐험가",
@@ -162,7 +166,8 @@ window.QUIZ_DATA = (() => {
       risks: ["맛없으면 돈 아까움", "기본템 사는 걸 까먹음"],
       weights: { promo: 1, popular: 2, new: 3, history: 1 },
       sections: ["신상품", "신상 인기", "취향 신상"],
-      basket: ["신상 간식", "신상 소스", "수입/특이템", "음료", "간편식", "디저트"]
+      basket: ["신상 간식", "신상 소스", "수입/특이템", "음료", "간편식", "디저트"],
+      partners: { best: "IQB", worst: "PVE" }
     },
     "IQB": {
       name: "우리집 요리사",
@@ -173,7 +178,8 @@ window.QUIZ_DATA = (() => {
       risks: ["재료비가 많이 듦", "요리하느라 지칠 수 있음"],
       weights: { promo: 1, popular: 3, new: 2, history: 1 },
       sections: ["인기 요리재료", "대용량 재료", "신상 소스/재료"],
-      basket: ["정육/해산물", "야채 박스", "마늘/양파", "양념", "면/밥류", "디저트(보상)"]
+      basket: ["정육/해산물", "야채 박스", "마늘/양파", "양념", "면/밥류", "디저트(보상)"],
+      partners: { best: "IQE", worst: "PVB" }
     }
   };
 
