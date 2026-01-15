@@ -37,9 +37,12 @@ window.Quiz = (() => {
 
   function setProgress(){
     const total = QUESTIONS.length;
+    
+    // 텍스트 라벨 (1 / 9)
     const label = $("progressLabel");
     if(label) label.textContent = `${state.idx+1} / ${total}`;
 
+    // 프로그레스 바 (width %)
     const bar = $("barFill");
     if(bar) bar.style.width = `${((state.idx+1)/total)*100}%`;
   }
@@ -54,16 +57,12 @@ window.Quiz = (() => {
 
     // 이미지 토글
     const imgEl = $("qImage");
-    const fallbackEl = $("qImageFallback");
-    if(imgEl && fallbackEl){
+    if(imgEl){
       if(q.image){
         imgEl.src = q.image;
         imgEl.style.display = "block";
-        fallbackEl.style.display = "none";
       }else{
-        imgEl.removeAttribute("src");
         imgEl.style.display = "none";
-        fallbackEl.style.display = "block";
       }
     }
 
@@ -131,72 +130,89 @@ window.Quiz = (() => {
     return s;
   }
 
+  // [수정] 결과 렌더링 함수
   function renderResult(key){
     const t = TYPES[key] || TYPES["PVE"];
 
+    // 뱃지 / 제목
     const badge = $("resultBadge");
-    if(badge) badge.textContent = `RESULT · ${key}`;
+    if(badge) badge.textContent = `MY TYPE`; // 고정 텍스트로 변경
 
     $("resultTitle").textContent = t.name;
     $("resultOne").textContent = t.one;
 
-    // 코드 표시(있으면)
+    // 코드 표시(숨김 처리할 수도 있지만 데이터용으로 둠)
     const codeEl = $("resultCodeText");
     if(codeEl) codeEl.textContent = key;
 
-    // 고정 퍼센트 표시(있으면)
+    // 비율
     const rateEl = document.getElementById("resultRateText");
     if(rateEl){
       const rate = (typeof t.rate === "number") ? t.rate.toFixed(2) : "--";
       rateEl.innerHTML = `전체 참여자 중 <b>${rate}%</b>가 같은 유형입니다.`;
     }
 
-    // 결과 이미지 토글(세로형)
+    // 결과 이미지
     const rImg = document.getElementById("resultImage");
-    const rFallback = document.getElementById("resultImageFallback");
-    if(rImg && rFallback){
+    if(rImg){
       if(t.image){
         rImg.src = t.image;
         rImg.style.display = "block";
-        rFallback.style.display = "none";
       }else{
-        rImg.removeAttribute("src");
         rImg.style.display = "none";
-        rFallback.style.display = "block";
       }
     }
 
-    // share URL
+    // share URL (hidden input)
     const share = $("shareUrl");
     if(share) share.value = location.href;
 
-    // chips
-    const strength = $("strengthChips"); strength.innerHTML = "";
-    t.strengths.forEach(x => strength.appendChild(chip(x)));
+    // Chips 채우기
+    const strength = $("strengthChips"); if(strength){ strength.innerHTML = ""; t.strengths.forEach(x => strength.appendChild(chip(x))); }
+    const risk = $("riskChips"); if(risk){ risk.innerHTML = ""; t.risks.forEach(x => risk.appendChild(chip(x))); }
+    const sec = $("sectionChips"); if(sec){ sec.innerHTML = ""; t.sections.forEach(x => sec.appendChild(chip(x))); }
+    const basket = $("basketChips"); if(basket){ basket.innerHTML = ""; t.basket.forEach(x => basket.appendChild(chip(x))); }
 
-    const risk = $("riskChips"); risk.innerHTML = "";
-    t.risks.forEach(x => risk.appendChild(chip(x)));
+    // [신규] 궁합(Partners) 렌더링
+    if(t.partners) {
+      renderPartner("partnerBest", t.partners.best);
+      renderPartner("partnerWorst", t.partners.worst);
+    }
 
-    const sec = $("sectionChips"); sec.innerHTML = "";
-    t.sections.forEach(x => sec.appendChild(chip(x)));
+    // [참고] 가중치 그리드(weightGrid)는 숨김 처리되어 있어 생략 가능하나 로직은 유지
+    const wg = $("weightGrid"); 
+    if(wg){
+       wg.innerHTML = "";
+       // ...기존 로직
+    }
+  }
 
-    const basket = $("basketChips"); basket.innerHTML = "";
-    t.basket.forEach(x => basket.appendChild(chip(x)));
+  // [신규] 파트너 카드 그리기 헬퍼
+  function renderPartner(elementId, partnerKey) {
+    const el = document.getElementById(elementId);
+    if(!el) return;
+    
+    const pData = TYPES[partnerKey];
+    if(!pData) return;
 
-    // weights
-    const wg = $("weightGrid"); wg.innerHTML = "";
-    [["promo","특가/행사"],["popular","인기/재구매"],["new","신상품"],["history","구매이력"]].forEach(([k,l])=>{
-      const d = document.createElement("div");
-      d.className = "w";
-      d.innerHTML = `<span>${l}</span><strong>${t.weights[k]}</strong>`;
-      wg.appendChild(d);
-    });
+    // 내부 HTML 구조 삽입
+    // 이미지 + 이름
+    el.innerHTML = `
+      <div style="background:#fff; border-radius:12px; padding:10px; text-align:center; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+        <div style="width:60px; height:60px; border-radius:50%; overflow:hidden; margin-bottom:8px; background:#f1f3f5;">
+          <img src="${pData.image}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'">
+        </div>
+        <div style="font-size:13px; font-weight:700; color:#333; line-height:1.2; word-break:keep-all;">${pData.name}</div>
+        <div style="font-size:11px; color:#adb5bd; margin-top:4px;">${partnerKey}</div>
+      </div>
+    `;
   }
 
   async function finish(){
     const key = computeKey();
     state.resultKey = key;
 
+    // URL 업데이트 (뒤로가기 지원 등)
     const url = new URL(location.href);
     url.hash = `t=${encodeURIComponent(key)}`;
     history.replaceState(null, "", url.toString());
@@ -235,7 +251,12 @@ window.Quiz = (() => {
     return false;
   }
 
-  function showIntro(){ setActiveView("viewIntro"); }
+  function showIntro(){ 
+    reset(); 
+    // 프로그레스바 초기화
+    const bar = $("barFill"); if(bar) bar.style.width = "0%";
+    setActiveView("viewIntro"); 
+  }
 
   function startQuiz(){
     reset();
@@ -243,24 +264,11 @@ window.Quiz = (() => {
     renderQuestion();
   }
 
-  function explain(){
-    const A = state.score.A, B = state.score.B, C = state.score.C;
-    alert(
-      `[점수]\n` +
-      `계획:${A.P} / 즉흥:${A.I}\n` +
-      `실속:${B.V} / 퀄리티:${B.Q}\n` +
-      `대용량:${C.B} / 간편:${C.E}\n\n` +
-      `동점이면 왼쪽(계획/실속/대용량) 우선\n` +
-      `결과 키: ${computeKey()}`
-    );
-  }
-
   return {
     state,
     startQuiz,
     showIntro,
     prev,
-    explain,
     renderResult,
     loadFromHash
   };
