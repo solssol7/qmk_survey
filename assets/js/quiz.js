@@ -37,12 +37,9 @@ window.Quiz = (() => {
 
   function setProgress(){
     const total = QUESTIONS.length;
-    
-    // 텍스트 라벨 (1 / 9)
     const label = $("progressLabel");
     if(label) label.textContent = `${state.idx+1} / ${total}`;
 
-    // 프로그레스 바 (width %)
     const bar = $("barFill");
     if(bar) bar.style.width = `${((state.idx+1)/total)*100}%`;
   }
@@ -66,7 +63,7 @@ window.Quiz = (() => {
       }
     }
 
-    // 선택지(소BTI 캡슐)
+    // 선택지 렌더링 (스타일 개선)
     const root = $("choices");
     root.innerHTML = "";
 
@@ -75,9 +72,14 @@ window.Quiz = (() => {
       btn.className = "choicePill";
       btn.type = "button";
 
-      // 줄바꿈 지원(가독성 좋게)
-      const text = `${choice.main}\n${choice.sub || ""}`.trim();
-      btn.textContent = text;
+      // [핵심 변경] innerHTML을 사용하여 줄바꿈 및 폰트 크기 조정
+      // main: 크게 / sub: 작게, 회색, 줄바꿈
+      const mainHtml = `<span style="font-size:17px; font-weight:700; display:block; margin-bottom:4px;">${choice.main}</span>`;
+      const subHtml = choice.sub 
+        ? `<span style="font-size:13px; font-weight:400; color:#868e96; display:block;">${choice.sub}</span>` 
+        : "";
+
+      btn.innerHTML = mainHtml + subHtml;
 
       btn.addEventListener("click", () => choose(i));
       root.appendChild(btn);
@@ -123,6 +125,7 @@ window.Quiz = (() => {
     renderQuestion();
   }
 
+  // 칩 생성 헬퍼
   function chip(text){
     const s = document.createElement("span");
     s.className = "chip";
@@ -130,29 +133,24 @@ window.Quiz = (() => {
     return s;
   }
 
-  // [수정] 결과 렌더링 함수
   function renderResult(key){
     const t = TYPES[key] || TYPES["PVE"];
 
-    // 뱃지 / 제목
     const badge = $("resultBadge");
-    if(badge) badge.textContent = `MY TYPE`; // 고정 텍스트로 변경
+    if(badge) badge.textContent = `MY TYPE`;
 
     $("resultTitle").textContent = t.name;
     $("resultOne").textContent = t.one;
 
-    // 코드 표시(숨김 처리할 수도 있지만 데이터용으로 둠)
     const codeEl = $("resultCodeText");
     if(codeEl) codeEl.textContent = key;
 
-    // 비율
     const rateEl = document.getElementById("resultRateText");
     if(rateEl){
       const rate = (typeof t.rate === "number") ? t.rate.toFixed(2) : "--";
       rateEl.innerHTML = `전체 참여자 중 <b>${rate}%</b>가 같은 유형입니다.`;
     }
 
-    // 결과 이미지
     const rImg = document.getElementById("resultImage");
     if(rImg){
       if(t.image){
@@ -163,31 +161,22 @@ window.Quiz = (() => {
       }
     }
 
-    // share URL (hidden input)
     const share = $("shareUrl");
     if(share) share.value = location.href;
 
-    // Chips 채우기
+    // Chips
     const strength = $("strengthChips"); if(strength){ strength.innerHTML = ""; t.strengths.forEach(x => strength.appendChild(chip(x))); }
     const risk = $("riskChips"); if(risk){ risk.innerHTML = ""; t.risks.forEach(x => risk.appendChild(chip(x))); }
     const sec = $("sectionChips"); if(sec){ sec.innerHTML = ""; t.sections.forEach(x => sec.appendChild(chip(x))); }
     const basket = $("basketChips"); if(basket){ basket.innerHTML = ""; t.basket.forEach(x => basket.appendChild(chip(x))); }
 
-    // [신규] 궁합(Partners) 렌더링
+    // 궁합 렌더링
     if(t.partners) {
       renderPartner("partnerBest", t.partners.best);
       renderPartner("partnerWorst", t.partners.worst);
     }
-
-    // [참고] 가중치 그리드(weightGrid)는 숨김 처리되어 있어 생략 가능하나 로직은 유지
-    const wg = $("weightGrid"); 
-    if(wg){
-       wg.innerHTML = "";
-       // ...기존 로직
-    }
   }
 
-  // [신규] 파트너 카드 그리기 헬퍼
   function renderPartner(elementId, partnerKey) {
     const el = document.getElementById(elementId);
     if(!el) return;
@@ -195,8 +184,6 @@ window.Quiz = (() => {
     const pData = TYPES[partnerKey];
     if(!pData) return;
 
-    // 내부 HTML 구조 삽입
-    // 이미지 + 이름
     el.innerHTML = `
       <div style="background:#fff; border-radius:12px; padding:10px; text-align:center; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;">
         <div style="width:60px; height:60px; border-radius:50%; overflow:hidden; margin-bottom:8px; background:#f1f3f5;">
@@ -212,7 +199,6 @@ window.Quiz = (() => {
     const key = computeKey();
     state.resultKey = key;
 
-    // URL 업데이트 (뒤로가기 지원 등)
     const url = new URL(location.href);
     url.hash = `t=${encodeURIComponent(key)}`;
     history.replaceState(null, "", url.toString());
@@ -253,7 +239,6 @@ window.Quiz = (() => {
 
   function showIntro(){ 
     reset(); 
-    // 프로그레스바 초기화
     const bar = $("barFill"); if(bar) bar.style.width = "0%";
     setActiveView("viewIntro"); 
   }
@@ -264,12 +249,5 @@ window.Quiz = (() => {
     renderQuestion();
   }
 
-  return {
-    state,
-    startQuiz,
-    showIntro,
-    prev,
-    renderResult,
-    loadFromHash
-  };
+  return { state, startQuiz, showIntro, prev, renderResult, loadFromHash };
 })();
