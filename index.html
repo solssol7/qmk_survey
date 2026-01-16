@@ -104,7 +104,7 @@
     .btn--pillGhost { background: #f1f3f5 !important; color: #495057 !important; }
     .btn--half { flex: 1; padding: 0 16px; min-width: 120px; }
 
-    /* [수정] 선택지 버튼 (텍스트 세로 정렬 지원) */
+    /* 선택지 버튼 */
     .choicePill {
       border: 1px solid #e9ecef !important;
       background: #fff !important;
@@ -190,6 +190,10 @@
 </head>
 
 <body>
+  <button id="btnDebugInfo" style="position:fixed; top:10px; right:10px; z-index:99999; background:red; color:white; border:none; border-radius:8px; padding:8px 12px; font-weight:bold; font-size:12px; opacity:0.8;">
+    DEBUG 🐞
+  </button>
+
   <div class="app">
     <main class="stage">
       <section class="card" aria-live="polite">
@@ -228,7 +232,8 @@
             <button id="btnPrev" class="iconBtn" type="button" aria-label="이전">←</button>
             <div class="brandRow__brand">질문</div>
             <div style="position:absolute; right:20px;">
-              <span id="progressLabel" class="progressTiny">1 / 10</span> </div>
+              <span id="progressLabel" class="progressTiny">1 / 10</span>
+            </div>
           </header>
 
           <div class="progressBarContainer">
@@ -350,6 +355,26 @@
   <script src="./assets/js/main.js"></script>
   
   <script>
+    document.getElementById("btnDebugInfo").addEventListener("click", () => {
+      const url = window.location.href;
+      const search = window.location.search;
+      const hash = window.location.hash;
+      const ua = navigator.userAgent;
+
+      // 파라미터 파싱 확인
+      const params = new URLSearchParams(search);
+      const uid = params.get("user_id");
+
+      alert(
+        "==== DEBUG INFO ====\n\n" +
+        "1. Full URL:\n" + url + "\n\n" +
+        "2. Search (쿼리):\n" + (search || "(없음)") + "\n\n" +
+        "3. Hash (해시):\n" + (hash || "(없음)") + "\n\n" +
+        "4. Parsed user_id:\n" + (uid || "NULL (인식실패)") + "\n\n" +
+        "5. User Agent:\n" + ua
+      );
+    });
+  
     document.addEventListener("DOMContentLoaded", () => {
       const btnBack = document.getElementById("btnBackFromResult");
       if(btnBack) {
