@@ -7,19 +7,18 @@
   const APP_DEEP_LINK_BASE = "example-app://quiz/result"; 
 
   const session_id = getOrCreateSessionId();
-  // 파라미터 이름을 'userId'로 변경
-  const userId = getParam("userId"); 
+  // [수정] 다시 user_id로 변경
+  const user_id = getParam("user_id"); 
   const utm = getUTM();
 
   function setUidNote(){
     const el = $("uidNote");
     if(!el) return;
-    // if(userId) el.textContent = `User: ${userId}`;
+    // if(user_id) el.textContent = `User: ${user_id}`;
   }
 
   // 퀴즈 동작 훅 (Hooks)
   window.AppActions = {
-    // 답변 클릭 시 (로그 기능 제거로 인해 비워둠 -> 코드 감소 원인)
     async onAnswer({ questionIndex, choiceIndex }){
       // Empty
     },
@@ -28,11 +27,10 @@
     async onResult({ resultKey, scores }){
       const t = TYPES[resultKey];
       
-      // Analytics가 활성화(설정)되어 있다면 저장 시도
       if(window.Analytics?.enabled()){
         await window.Analytics.saveResult({
           session_id,
-          userId: userId || null, 
+          user_id: user_id || null, // [수정] user_id 전달
           result_key: resultKey,
           result_name: t?.name || null,
           scores,
@@ -44,7 +42,6 @@
       }
     },
 
-    // 공유된 링크로 들어왔을 때 (로그 제거로 비워둠)
     async onSharedResult({ resultKey }){
       // Empty
     }
@@ -55,8 +52,8 @@
     let baseUrl = APP_DEEP_LINK_BASE;
     const params = new URLSearchParams();
 
-    // 추천인 ID 및 결과 타입 파라미터 추가
-    if (userId) params.set("recommendUserId", userId);
+    // [수정] 추천인 파라미터도 스네이크케이스(recommend_user_id)로 복구
+    if (user_id) params.set("recommend_user_id", user_id);
     if (window.Quiz.state.resultKey) params.set("t", window.Quiz.state.resultKey);
 
     const queryString = params.toString();
@@ -74,12 +71,11 @@
       await navigator.clipboard.writeText(deepLink);
       toast("앱 공유 링크가 복사되었어요!");
     } catch {
-      // 클립보드 접근 권한 없을 때 대비
       prompt("아래 링크를 복사해서 공유하세요!", deepLink);
     }
   }
 
-  // 기본 공유 기능 (모바일 네이티브 공유)
+  // 기본 공유 기능
   async function shareNative() {
     const deepLink = getDeepLink();
     if (navigator.share) {
@@ -90,7 +86,7 @@
           url: deepLink,
         });
       } catch (err) {
-        // 공유 취소 시 에러 무시
+        // 무시
       }
     } else {
       copyLink();
@@ -107,9 +103,9 @@
     toast("이미지를 만들고 있어요...");
 
     html2canvas(target, {
-      scale: 2, // 고화질
-      backgroundColor: "#ffffff", // 배경 투명 방지
-      useCORS: true // 외부 이미지 로딩 허용
+      scale: 2,
+      backgroundColor: "#ffffff",
+      useCORS: true
     }).then(canvas => {
       const link = document.createElement("a");
       const filename = `market_mbti_${window.Quiz.state.resultKey || "result"}.png`;
@@ -134,7 +130,7 @@
   // 버튼 이벤트 연결
   $("btnStart")?.addEventListener("click", () => window.Quiz.startQuiz());
   $("btnDemo")?.addEventListener("click", () => {
-    window.Quiz.renderResult("PVE"); // 데모용 (임의 결과)
+    window.Quiz.renderResult("PVE");
     setActiveView("viewResult");
   });
   $("btnPrev")?.addEventListener("click", () => window.Quiz.prev());
