@@ -3,22 +3,23 @@
   const { $, getParam, getUTM, getOrCreateSessionId, toast, setActiveView } = window.Utils;
   const { TYPES } = window.QUIZ_DATA;
 
-  // [설정] 앱 딥링크 주소 (개발팀에 문의하여 변경 필요)
+  // [설정] 앱 딥링크 주소
   const APP_DEEP_LINK_BASE = "example-app://quiz/result"; 
 
   const session_id = getOrCreateSessionId();
-  const user_id = getParam("user_id"); 
+  // 파라미터 이름을 'userId'로 변경
+  const userId = getParam("userId"); 
   const utm = getUTM();
 
   function setUidNote(){
     const el = $("uidNote");
     if(!el) return;
-    // if(user_id) el.textContent = `User: ${user_id}`;
+    // if(userId) el.textContent = `User: ${userId}`;
   }
 
   // 퀴즈 동작 훅 (Hooks)
   window.AppActions = {
-    // 답변 클릭 시 (로그 기능 제거로 인해 비워둠)
+    // 답변 클릭 시 (로그 기능 제거로 인해 비워둠 -> 코드 감소 원인)
     async onAnswer({ questionIndex, choiceIndex }){
       // Empty
     },
@@ -31,7 +32,7 @@
       if(window.Analytics?.enabled()){
         await window.Analytics.saveResult({
           session_id,
-          user_id: user_id || null, // URL에서 파싱한 user_id
+          userId: userId || null, 
           result_key: resultKey,
           result_name: t?.name || null,
           scores,
@@ -43,7 +44,7 @@
       }
     },
 
-    // 공유된 링크로 들어왔을 때 (필요 시 로직 추가)
+    // 공유된 링크로 들어왔을 때 (로그 제거로 비워둠)
     async onSharedResult({ resultKey }){
       // Empty
     }
@@ -55,7 +56,7 @@
     const params = new URLSearchParams();
 
     // 추천인 ID 및 결과 타입 파라미터 추가
-    if (user_id) params.set("recommend_user_id", user_id);
+    if (userId) params.set("recommendUserId", userId);
     if (window.Quiz.state.resultKey) params.set("t", window.Quiz.state.resultKey);
 
     const queryString = params.toString();
