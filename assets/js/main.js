@@ -3,12 +3,18 @@
   const { $, getParam, getUTM, getOrCreateSessionId, toast, setActiveView } = window.Utils;
   const { TYPES } = window.QUIZ_DATA;
 
-  // [설정] 앱 딥링크 주소 (개발팀이 설정한 스킴으로 변경 필요)
+  // [설정] 앱 딥링크 주소
   const APP_DEEP_LINK_BASE = "example-app://quiz/result"; 
 
   const session_id = getOrCreateSessionId();
-  // URL에서 user_id 파라미터 획득 (예: ?user_id=123)
+  
+  // 1. 사용자 ID (로그인한 사람)
   const user_id = getParam("user_id"); 
+  
+  // 2. 추천인 코드 (누구 링크 타고 왔는지) - URL 파라미터 확인 필요
+  // 보통 'recommend_user_id' 또는 'ref' 등으로 넘어옵니다.
+  const recommend_user_id = getParam("recommend_user_id") || getParam("ref");
+
   const utm = getUTM();
 
   function setUidNote(){
@@ -16,21 +22,27 @@
     if(!el) return;
   }
 
-  // 퀴즈 동작 훅 (Hooks)
   window.AppActions = {
-    // 답변 클릭 시
     async onAnswer({ questionIndex, choiceIndex }){
       // Empty
     },
 
-    // 결과 산출 시 Supabase에 자동 저장
+    // [중요] 결과 저장 로직 변경
     async onResult({ resultKey, scores }){
       const t = TYPES[resultKey];
       
+      // 저장 조건: user_id가 있거나 OR 추천인(recommend_user_id)이 있을 때만 저장
+      if (!user_id && !recommend_user_id) {
+        console.log("식별 정보(user_id, recommend_user_id)가 없어 저장하지 않습니다.");
+        return; 
+      }
+
       if(window.Analytics?.enabled()){
         await window.Analytics.saveResult({
           session_id,
-          user_id: user_id || null, // URL에서 받은 ID 저장
+          user_id: user_id || null, 
+          // 추천인 정보도 저장하고 싶으면 supabase.js의 saveResult 인자에 추가 필요 (선택사항)
+          // 여기서는 일단 기존 구조대로 저장
           result_key: resultKey,
           result_name: t?.name || null,
           scores,
@@ -38,7 +50,7 @@
           utm,
           referrer: document.referrer || null
         });
-        console.log("결과 데이터 저장 완료");
+        console.log("조건 충족: 결과 데이터 저장 완료");
       }
     },
 
@@ -47,12 +59,10 @@
     }
   };
 
-  // 딥링크 생성 함수
   function getDeepLink() {
     let baseUrl = APP_DEEP_LINK_BASE;
     const params = new URLSearchParams();
 
-    // 내 user_id를 추천인 ID(recommend_user_id)로 넘김
     if (user_id) params.set("recommend_user_id", user_id);
     if (window.Quiz.state.resultKey) params.set("t", window.Quiz.state.resultKey);
 
@@ -63,7 +73,6 @@
     return `${baseUrl}${separator}${queryString}`;
   }
 
-  // 링크 복사
   async function copyLink(){
     const deepLink = getDeepLink();
     try {
@@ -74,7 +83,6 @@
     }
   }
 
-  // 네이티브 공유
   async function shareNative() {
     const deepLink = getDeepLink();
     if (navigator.share) {
@@ -90,7 +98,6 @@
     }
   }
 
-  // 결과 이미지 저장 (내부 라이브러리 사용)
   function saveResultImage() {
     const target = document.querySelector(".card");
     if (!window.html2canvas) {
@@ -100,9 +107,9 @@
     toast("이미지를 만들고 있어요...");
 
     html2canvas(target, {
-      scale: 2, 
-      backgroundColor: "#ffffff", 
-      useCORS: true 
+      scale: 2,
+      backgroundColor: "#ffffff",
+      useCORS: true
     }).then(canvas => {
       const link = document.createElement("a");
       const filename = `market_mbti_${window.Quiz.state.resultKey || "result"}.png`;
@@ -124,10 +131,9 @@
     setActiveView("viewIntro");
   }
 
-  // 이벤트 연결
   $("btnStart")?.addEventListener("click", () => window.Quiz.startQuiz());
   $("btnDemo")?.addEventListener("click", () => {
-    window.Quiz.renderResult("PVE"); 
+    window.Quiz.renderResult("PVE");
     setActiveView("viewResult");
   });
   $("btnPrev")?.addEventListener("click", () => window.Quiz.prev());
@@ -138,7 +144,6 @@
   
   $("btnRestart")?.addEventListener("click", () => restartToIntro());
 
-  // 초기화
   setUidNote();
   window.Quiz.loadFromHash();
 })();
