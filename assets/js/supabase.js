@@ -31,11 +31,11 @@ window.Analytics = (() => {
     }
   }
 
-  // [수정] 결과 자동 저장 함수
-  async function saveResult({ session_id, user_id, result_key, result_name, scores, weights, utm, referrer }){
+  // [수정] userId 파라미터 이름 변경 및 매핑
+  async function saveResult({ session_id, userId, result_key, result_name, scores, weights, utm, referrer }){
     const row = {
       session_id,
-      user_id,             // URL에서 파싱된 user_id
+      user_id: userId,     // [중요] JS 변수 userId -> DB 컬럼 user_id 매핑
       quiz_version: QUIZ_VERSION,
       result_key,
       result_name,
@@ -45,7 +45,6 @@ window.Analytics = (() => {
       referrer
     };
     
-    // quiz_results 테이블에 저장
     return await insert("quiz_results", [row]);
   }
 
