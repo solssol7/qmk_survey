@@ -212,6 +212,12 @@ window.Quiz = (() => {
   }
 
   async function finish(){
+    // [로딩 추가] 먼저 로딩 화면을 보여줌
+    setActiveView("viewLoading");
+
+    // [로딩 추가] 분석하는 척 1.5초 대기
+    await new Promise(r => setTimeout(r, 1500));
+
     const key = computeKey();
     state.resultKey = key;
 
