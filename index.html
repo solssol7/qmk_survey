@@ -10,8 +10,6 @@
   <link rel="stylesheet" href="./assets/css/layout.css" />
   <link rel="stylesheet" href="./assets/css/components.css" />
 
-  <script src="./assets/js/html2canvas.min.js"></script>
-
   <style>
     /* 레이아웃 & 폰트 설정 */
     body { background-color: #f8f9fa; }
@@ -60,7 +58,11 @@
       cursor: pointer;
       z-index: 10;
     }
-    .brandRow__brand { font-size: 18px; font-weight: 800; color: #333; }
+    /* [수정] 클릭 반응을 위해 포인터 커서 추가 및 선택 방지 */
+    .brandRow__brand { 
+      font-size: 18px; font-weight: 800; color: #333; 
+      user-select: none; cursor: pointer; 
+    }
     .progressTiny { font-size: 14px; font-weight: 700; color: #adb5bd; }
 
     /* 프로그레스 바 */
@@ -184,7 +186,7 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* [추가] 로딩 스피너 애니메이션 */
+    /* 로딩 스피너 애니메이션 */
     .spinner {
       width: 48px;
       height: 48px;
@@ -203,6 +205,7 @@
 
 <body>
   <button id="btnDebugInfo" style="
+      display: none; 
       position: fixed; 
       top: 150px; right: 20px; z-index: 999999; 
       background: #ff0000; color: #fff; 
@@ -357,21 +360,24 @@
           </div>
 
           <div class="resultActions" style="padding: 0 20px 30px;">
-            <div class="saveHint" style="text-align:center; font-size:13px; color:#adb5bd; margin-bottom:10px;">이미지 저장을 눌러 결과를 간직하세요!</div>
             <div class="actions actions--stack" style="justify-content: center;">
-              <div style="display:flex; gap:10px; width:100%;">
-                <button id="btnShare" class="btn btn--pillPrimary btn--half" type="button">공유하기</button>
-                <button id="btnCopy" class="btn btn--pillGhost btn--half" type="button" style="background:#f1f3f5 !important;">링크 복사</button>
-              </div>
-              <button id="btnSave" class="btn btn--pillGhost" type="button" style="width:100%; background:#fff !important; border:1px solid #dee2e6 !important; color:#FF6B6B !important;">
-                ⬇️ 결과 이미지로 저장
+              
+              <button id="btnShare" class="btn btn--pillPrimary" type="button" style="width: 100%;">
+                ✨ 결과 공유하기
               </button>
-              <button id="btnRestart" class="btn btn--pillGhost" type="button" style="width:100%; background:#fff !important; border:1px solid #dee2e6 !important;">
+
+              <button id="btnCopy" class="btn btn--pillGhost" type="button" style="width:100%; background:#fff !important; color:#FF6B6B !important; border:1px solid #ffccb0 !important;">
+                🔗 링크 복사하기
+              </button>
+              
+              <button id="btnRestart" class="btn btn--pillGhost" type="button" style="width:100%; background:#f8f9fa !important; border:none !important; color:#868e96 !important; font-size: 14px; margin-top: 10px;">
                 🔄 다시 테스트하기
               </button>
+
             </div>
             <input id="shareUrl" class="shareUrl" style="opacity:0; position:absolute; pointer-events:none;" />
           </div>
+
         </div>
 
       </section>
@@ -387,14 +393,42 @@
   <script src="./assets/js/main.js"></script>
   
   <script>
-    // [디버깅 로직]
+    // [비밀 기능] 헤더 타이틀 5번 연속 탭하면 디버그 버튼 활성화
+    (function(){
+      let debugClicks = 0;
+      let debugTimer = null;
+      
+      const brands = document.querySelectorAll(".brandRow__brand");
+      brands.forEach(el => {
+        el.addEventListener("click", () => {
+          debugClicks++;
+          if (debugTimer) clearTimeout(debugTimer);
+
+          // 0.5초 안에 다음 클릭이 없으면 리셋
+          debugTimer = setTimeout(() => {
+            debugClicks = 0;
+          }, 500);
+
+          // 5번 연속 클릭 시 버튼 보이기
+          if (debugClicks >= 5) {
+            const btn = document.getElementById("btnDebugInfo");
+            if(btn) {
+              btn.style.display = "block";
+              alert("🐞 디버그 모드가 켜졌습니다!");
+            }
+            debugClicks = 0;
+          }
+        });
+      });
+    })();
+
+    // [기존] 디버깅 버튼 클릭 이벤트
     document.getElementById("btnDebugInfo").addEventListener("click", () => {
       const url = window.location.href;
       const search = window.location.search;
       const hash = window.location.hash;
       const ua = navigator.userAgent;
       
-      // user_id 파싱 확인
       let uid = "NULL";
       try {
         const params = new URLSearchParams(search);
@@ -408,7 +442,6 @@
         "[4] user_id:\n" + (uid || "NULL (인식실패)") + "\n\n" +
         "[5] UA:\n" + ua;
 
-      // 화면 출력
       document.getElementById("debugText").textContent = log;
       document.getElementById("debugConsole").style.display = "block";
     });
