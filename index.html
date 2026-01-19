@@ -7,12 +7,28 @@
   <title>장보기 MBTI 테스트</title>
 
   <script>
-    (function(a,i,r,b,d,g,e){a['Airbridge']=d;a[d]=a[d]||function(){
-    (a[d].q=a[d].q||[]).push(arguments)};g=i.createElement(r);g.async=!0;
-    g.src=b;e=i.getElementsByTagName(r)[0];e.parentNode.insertBefore(g,e)
-    })(window,document,'script','https://static.airbridge.io/sdk/latest/airbridge.min.js','airbridge');
-  </script>
+    (function() {
+      // 1. 글로벌 변수 설정
+      window.Airbridge = 'airbridge';
+      
+      // 2. 스텁(Stub) 객체 생성: 미리 명령을 받아둘 큐(Queue) 생성
+      window.airbridge = window.airbridge || { q: [] };
 
+      // 3. 주요 메서드 미리 만들어두기 (.init 호출 시 에러 방지)
+      ['init', 'createTrackingLink', 'track', 'events'].forEach(function(method) {
+        window.airbridge[method] = window.airbridge[method] || function() {
+          // SDK 로드 전 호출된 명령은 큐에 저장
+          window.airbridge.q.push([method].concat(Array.prototype.slice.call(arguments)));
+        };
+      });
+
+      // 4. 실제 SDK 스크립트 로드
+      var script = document.createElement('script');
+      script.src = 'https://static.airbridge.io/sdk/latest/airbridge.min.js';
+      script.async = true;
+      document.getElementsByTagName('head')[0].appendChild(script);
+    })();
+  </script>
   <meta property="og:type" content="website" />
   <meta property="og:title" content="장보기 MBTI 테스트" />
   <meta property="og:description" content="1분 만에 끝나는 나의 장보기 성향 분석! 나와 딱 맞는 마트 쇼핑 유형은?" />
@@ -24,7 +40,7 @@
   <link rel="stylesheet" href="./assets/css/components.css" />
 
   <style>
-    /* 레이아웃 & 폰트 설정 */
+    /* ... (기존 스타일 유지) ... */
     body { background-color: #f8f9fa; }
     .app {
       display: flex;
@@ -115,6 +131,7 @@
       box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4) !important;
     }
     .btn--pillGhost { background: #f1f3f5 !important; color: #495057 !important; }
+    .btn--pillGhost2 { background: #fff !important; color: #495057 !important; border: 1px solid #dee2e6 !important;}
     .btn--half { flex: 1; padding: 0 16px; min-width: 120px; }
 
     /* 선택지 버튼 */
