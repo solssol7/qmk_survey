@@ -9,7 +9,7 @@
   const AIRBRIDGE_APP_NAME = "qmarket"; 
   
   // [입력됨] 제공해주신 API 토큰
-  const AIRBRIDGE_WEB_TOKEN = "b9570777b7534dfc85eb1bf89204f2e7"; 
+  const AIRBRIDGE_WEB_TOKEN = "aa31841e91b24c5395aa6569c7e9eced"; 
 
   // 1. 웹뷰 타겟 도메인 (https:// 필수)
   const WEBVIEW_TARGET_DOMAIN = "https://mbti.event.qmarket.me"; 
