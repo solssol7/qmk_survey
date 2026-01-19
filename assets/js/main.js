@@ -11,8 +11,7 @@
   // 1. 사용자 ID (로그인한 사람)
   const user_id = getParam("user_id"); 
   
-  // 2. 추천인 코드 (누구 링크 타고 왔는지) - URL 파라미터 확인 필요
-  // 보통 'recommend_user_id' 또는 'ref' 등으로 넘어옵니다.
+  // 2. 추천인 코드
   const recommend_user_id = getParam("recommend_user_id") || getParam("ref");
 
   const utm = getUTM();
@@ -27,7 +26,7 @@
       // Empty
     },
 
-    // [중요] 결과 저장 로직 변경
+    // [중요] 결과 저장 로직
     async onResult({ resultKey, scores }){
       const t = TYPES[resultKey];
       
@@ -41,8 +40,6 @@
         await window.Analytics.saveResult({
           session_id,
           user_id: user_id || null, 
-          // 추천인 정보도 저장하고 싶으면 supabase.js의 saveResult 인자에 추가 필요 (선택사항)
-          // 여기서는 일단 기존 구조대로 저장
           result_key: resultKey,
           result_name: t?.name || null,
           scores,
@@ -98,30 +95,7 @@
     }
   }
 
-  function saveResultImage() {
-    const target = document.querySelector(".card");
-    if (!window.html2canvas) {
-      toast("잠시만 기다려주세요 (라이브러리 로딩 중)");
-      return;
-    }
-    toast("이미지를 만들고 있어요...");
-
-    html2canvas(target, {
-      scale: 2,
-      backgroundColor: "#ffffff",
-      useCORS: true
-    }).then(canvas => {
-      const link = document.createElement("a");
-      const filename = `market_mbti_${window.Quiz.state.resultKey || "result"}.png`;
-      link.download = filename;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-      toast("이미지가 저장되었어요!");
-    }).catch(err => {
-      console.error(err);
-      toast("저장에 실패했어요. 다시 시도해주세요.");
-    });
-  }
+  // [삭제됨] saveResultImage 함수 제거
 
   function restartToIntro(){
     const url = new URL(location.href);
@@ -140,7 +114,8 @@
   
   $("btnCopy")?.addEventListener("click", () => copyLink());
   $("btnShare")?.addEventListener("click", () => shareNative());
-  $("btnSave")?.addEventListener("click", () => saveResultImage());
+  
+  // [삭제됨] 이미지 저장 버튼 이벤트 제거
   
   $("btnRestart")?.addEventListener("click", () => restartToIntro());
 
