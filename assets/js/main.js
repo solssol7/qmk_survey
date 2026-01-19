@@ -8,10 +8,10 @@
   // =========================================================================
   const AIRBRIDGE_APP_NAME = "qmarket"; 
   
-  // [필수] 에어브릿지 대시보드 > Settings > Tokens > Web SDK Token 값 입력
+  // [입력됨] 제공해주신 API 토큰
   const AIRBRIDGE_WEB_TOKEN = "b9570777b7534dfc85eb1bf89204f2e7"; 
 
-  // 1. 웹뷰 타겟 도메인
+  // 1. 웹뷰 타겟 도메인 (https:// 필수)
   const WEBVIEW_TARGET_DOMAIN = "https://mbti.event.qmarket.me"; 
   
   // 2. 앱 미설치 시 이동할 스토어 주소 (Fallback)
@@ -20,6 +20,7 @@
   // =========================================================================
 
   // [초기화] 에어브릿지 SDK 실행
+  // index.html의 스니펫 덕분에 window.airbridge가 미리 존재합니다.
   if (window.airbridge) {
     window.airbridge.init({
       app: AIRBRIDGE_APP_NAME,
@@ -63,17 +64,17 @@
     async onSharedResult({ resultKey }){ }
   };
 
-  // [핵심] 숏링크 생성 함수
+  // [핵심] 숏링크 생성 함수 (비동기 API 호출)
   async function generateShortLink() {
     toast("공유 링크를 만들고 있어요...");
 
-    // 1. 내부 웹 URL
+    // 1. 내부 웹 URL (mbti.event.qmarket.me?...)
     const targetParams = new URLSearchParams();
     if (user_id) targetParams.set("recommend_user_id", user_id);
     if (window.Quiz.state.resultKey) targetParams.set("t", window.Quiz.state.resultKey);
     const innerUrl = `${WEBVIEW_TARGET_DOMAIN}?${targetParams.toString()}`;
 
-    // 2. 앱 스킴
+    // 2. 앱 스킴 (qmarket://webview?link=...)
     const appScheme = `qmarket://webview?link=${encodeURIComponent(innerUrl)}`;
 
     try {
@@ -82,21 +83,27 @@
       const result = await window.airbridge.createTrackingLink({
         channel: "in_app_referral",
         campaign: "friend_invite_2025",
+        
+        // 딥링크 및 Fallback 설정
         deeplink_url: appScheme,
         android_fallback_url: ANDROID_STORE_URL,
         ios_fallback_url: IOS_STORE_URL,
         fallback_url: ANDROID_STORE_URL,
+
+        // 미리보기 설정 (OG Tag)
         og_tags: {
           title: "장보기 MBTI 테스트",
           description: "나의 장보기 성향을 앱에서 확인해보세요!",
           image: "https://mbti.event.qmarket.me/assets/img/intro/intro.webp"
         }
       });
-      return result.shortUrl; // 성공 시 숏링크 반환
+
+      // 성공: 숏링크(예: https://abr.ge/abcd) 반환
+      return result.shortUrl; 
 
     } catch (e) {
       console.error("숏링크 생성 실패, 롱링크로 대체합니다.", e);
-      // 실패 시 롱링크 반환
+      // 실패: 긴 링크(롱링크) 반환
       return `https://${AIRBRIDGE_APP_NAME}.airbridge.io/links` +
         `?channel=in_app_referral` +
         `&campaign=friend_invite_2025` +
@@ -107,9 +114,9 @@
     }
   }
 
-  // [수정] 링크 복사 버튼 (전달받은 링크가 있으면 그걸 쓰고, 없으면 새로 생성)
+  // [수정] 링크 복사 버튼 (이미 만든 링크가 있다면 재사용)
   async function copyLink(existingLink = null){
-    // 인자로 받은 링크가 있으면 재사용, 없으면 새로 생성 (await 필수)
+    // 인자로 받은 링크가 있으면 쓰고, 없으면 새로 만듦
     const link = existingLink || await generateShortLink(); 
     
     try {
@@ -132,11 +139,10 @@
           url: link,
         });
       } catch (err) {
-        // 공유 창 띄웠다가 취소한 경우는 에러로 보지 않음 (조용히 종료)
+        // 사용자가 공유 창을 닫은 경우 (에러 아님)
       }
     } else {
-      // 2. 공유 기능이 없는 PC 등에서는 복사 기능으로 연결
-      // (이때 방금 만든 'link'를 넘겨줘서 두 번 생성하는 비효율 방지)
+      // 2. 공유 기능이 없으면 복사 기능으로 연결 (방금 만든 링크 전달)
       copyLink(link);
     }
   }
@@ -156,6 +162,7 @@
   });
   $("btnPrev")?.addEventListener("click", () => window.Quiz.prev());
   
+  // 비동기 함수 연결
   $("btnCopy")?.addEventListener("click", () => copyLink());
   $("btnShare")?.addEventListener("click", () => shareNative());
   
