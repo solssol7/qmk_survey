@@ -19,165 +19,159 @@
   const ANDROID_STORE_URL = "https://play.google.com/store/apps/details?id=com.aswemake.qmarket";
   const IOS_STORE_URL = "https://apps.apple.com/kr/app/%ED%81%90%EB%A7%88%EC%BC%93-%EC%9A%B0%EB%A6%AC-%EB%8F%99%EB%84%A4-%EC%8A%88%ED%8D%BC%EB%A7%88%ED%8A%B8-%EC%8B%9D%ED%92%88-%ED%95%A0%EC%9D%B8-%EB%8B%B9%EC%9D%BC-%EB%B0%B0%EB%8B%AC/id1514329713";
   // =========================================================================
-
-  // [SDK 초기화]
   if (window.airbridge) {
-    window.airbridge.init({
-      app: AIRBRIDGE_APP_NAME,
-      webToken: AIRBRIDGE_WEB_TOKEN,
-      useMbox: false
-    });
-  }
-
-  const session_id = getOrCreateSessionId();
-  const user_id = getParam("user_id"); 
-  const recommend_user_id = getParam("recommend_user_id") || getParam("ref");
-  const utm = getUTM();
-
-  function setUidNote(){
-    const el = $("uidNote");
-    if(!el) return;
-  }
-
-  window.AppActions = {
-    async onAnswer({ questionIndex, choiceIndex }){ },
-    async onResult({ resultKey, scores }){
-      const t = TYPES[resultKey];
-      if (!user_id && !recommend_user_id) return; 
-      if(window.Analytics?.enabled()){
-        await window.Analytics.saveResult({
-          session_id, user_id, result_key: resultKey, result_name: t?.name, scores, weights: t?.weights, utm, referrer: document.referrer
-        });
-      }
-    },
-    async onSharedResult({ resultKey }){ }
-  };
-
-  // [핵심] 숏링크 생성 함수
-  async function generateShortLink() {
-    toast("공유 링크를 만들고 있어요...");
-
-    // 토큰 누락 체크
-    if (!AIRBRIDGE_API_TOKEN || AIRBRIDGE_API_TOKEN.includes("여기에")) {
-      console.error("❌ API Token이 설정되지 않았습니다. main.js를 확인하세요.");
-      return null;
-    }
-
-    const targetParams = new URLSearchParams();
-    if (user_id) targetParams.set("recommend_user_id", user_id);
-    if (window.Quiz.state.resultKey) targetParams.set("t", window.Quiz.state.resultKey);
-    const innerUrl = `${WEBVIEW_TARGET_DOMAIN}?${targetParams.toString()}`;
-
-    const appScheme = `qmarket://webview?link=${encodeURIComponent(innerUrl)}`;
-
-    try {
-      const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-      const apiUrl = isLocal ? 'https://api.airbridge.io/v1/tracking-links' : '/api/airbridge/links';
-
-      console.log(`[Link] 요청 시작: ${apiUrl}`);
-
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${AIRBRIDGE_API_TOKEN}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          channel: "in_app_referral",
-          campaignParams: {
-            campaign: "friend_invite_2025",
-            ad_group: "referral",
-            ad_creative: "invitation"
-          },
-          // [수정 포인트] false -> "Off" (따옴표로 감싼 문자열이어야 합니다)
-          isReengagement: "Off", 
-          
-          deeplinkUrl: appScheme,
-          deeplinkOption: {
-            showAlertForInitialDeeplinkingIssue: true
-          },
-          fallbackPaths: {
-            option: {
-              android: ANDROID_STORE_URL,
-              ios: IOS_STORE_URL
-            }
-          },
-          ogTag: {
-            title: "장보기 MBTI 테스트",
-            description: "나의 장보기 성향을 앱에서 확인해보세요!",
-            image: "https://mbti.event.qmarket.me/assets/img/intro/intro.webp"
-          }
-        })
+      window.airbridge.init({
+        app: AIRBRIDGE_APP_NAME,
+        webToken: AIRBRIDGE_WEB_TOKEN,
+        useMbox: false
       });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`[Link] API 에러(${response.status}):`, errorText);
-        throw new Error(`API 오류: ${response.status}`);
+    }
+  
+    const session_id = getOrCreateSessionId();
+    const user_id = getParam("user_id"); 
+    const recommend_user_id = getParam("recommend_user_id") || getParam("ref");
+    const utm = getUTM();
+  
+    function setUidNote(){
+      const el = $("uidNote");
+      if(!el) return;
+    }
+  
+    window.AppActions = {
+      async onAnswer({ questionIndex, choiceIndex }){ },
+      async onResult({ resultKey, scores }){
+        const t = TYPES[resultKey];
+        if (!user_id && !recommend_user_id) return; 
+        if(window.Analytics?.enabled()){
+          await window.Analytics.saveResult({
+            session_id, user_id, result_key: resultKey, result_name: t?.name, scores, weights: t?.weights, utm, referrer: document.referrer
+          });
+        }
+      },
+      async onSharedResult({ resultKey }){ }
+    };
+  
+    // [수정됨] 숏링크 생성 함수
+    async function generateShortLink() {
+      toast("공유 링크를 만들고 있어요...");
+  
+      if (!AIRBRIDGE_API_TOKEN || AIRBRIDGE_API_TOKEN.includes("여기에")) {
+        console.error("❌ API Token이 설정되지 않았습니다.");
+        return null;
       }
-
-      const resJson = await response.json();
-      // 응답 구조에서 shortURL 추출
-      const shortLink = resJson.data?.trackingLink?.shortURL;
-
-      if (!shortLink) throw new Error("응답에 shortURL이 없습니다.");
-
-      console.log("[Link] 생성 성공:", shortLink);
-      return shortLink; 
-
-    } catch (e) {
-      console.error("[Link] 실패, 롱링크 대체:", e);
-      // 실패 시 롱링크 반환
-      return `https://${AIRBRIDGE_APP_NAME}.airbridge.io/links` +
-        `?channel=in_app_referral` +
-        `&campaign=friend_invite_2025` +
-        `&deeplink_url=${encodeURIComponent(appScheme)}` +
-        `&android_fallback_url=${encodeURIComponent(ANDROID_STORE_URL)}` +
-        `&ios_fallback_url=${encodeURIComponent(IOS_STORE_URL)}` +
-        `&fallback_url=${encodeURIComponent(ANDROID_STORE_URL)}`;
-    }
-  }
-
-  async function copyLink(existingLink = null){
-    const link = existingLink || await generateShortLink(); 
-    if (!link) return;
-
-    try {
-      await navigator.clipboard.writeText(link);
-      toast("짧은 공유 링크가 복사되었어요!");
-    } catch {
-      prompt("아래 링크를 복사하세요!", link);
-    }
-  }
-
-  async function shareNative() {
-    const link = await generateShortLink(); 
-    if (!link) return;
-
-    if (navigator.share) {
+  
+      const targetParams = new URLSearchParams();
+      if (user_id) targetParams.set("recommend_user_id", user_id);
+      if (window.Quiz.state.resultKey) targetParams.set("t", window.Quiz.state.resultKey);
+      const innerUrl = `${WEBVIEW_TARGET_DOMAIN}?${targetParams.toString()}`;
+  
+      const appScheme = `qmarket://webview?link=${encodeURIComponent(innerUrl)}`;
+  
       try {
-        await navigator.share({
-          title: '장보기 MBTI 테스트',
-          text: '나의 장보기 성향을 앱에서 확인해보세요!',
-          url: link,
+        const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        const apiUrl = isLocal ? 'https://api.airbridge.io/v1/tracking-links' : '/api/airbridge/links';
+  
+        console.log(`[Link] 요청 시작: ${apiUrl}`);
+  
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${AIRBRIDGE_API_TOKEN}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            channel: "in_app_referral",
+            campaignParams: {
+              campaign: "friend_invite_2025",
+              ad_group: "referral",
+              ad_creative: "invitation"
+            },
+            // 🔴 [수정] 에러를 유발하는 isReengagement 필드를 완전히 삭제했습니다.
+            // (삭제 시 기본값으로 처리되어 오류가 발생하지 않습니다)
+            
+            deeplinkUrl: appScheme,
+            deeplinkOption: {
+              showAlertForInitialDeeplinkingIssue: true
+            },
+            fallbackPaths: {
+              option: {
+                android: ANDROID_STORE_URL,
+                ios: IOS_STORE_URL
+              }
+            },
+            ogTag: {
+              title: "장보기 MBTI 테스트",
+              description: "나의 장보기 성향을 앱에서 확인해보세요!",
+              image: "https://mbti.event.qmarket.me/assets/img/intro/intro.webp"
+            }
+          })
         });
-      } catch (err) { }
-    } else {
-      copyLink(link);
+  
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`[Link] API 에러(${response.status}):`, errorText);
+          throw new Error(`API 오류: ${response.status}`);
+        }
+  
+        const resJson = await response.json();
+        const shortLink = resJson.data?.trackingLink?.shortURL;
+  
+        if (!shortLink) throw new Error("응답에 shortURL이 없습니다.");
+  
+        console.log("[Link] 생성 성공:", shortLink);
+        return shortLink; 
+  
+      } catch (e) {
+        console.error("[Link] 실패, 롱링크 대체:", e);
+        return `https://${AIRBRIDGE_APP_NAME}.airbridge.io/links` +
+          `?channel=in_app_referral` +
+          `&campaign=friend_invite_2025` +
+          `&deeplink_url=${encodeURIComponent(appScheme)}` +
+          `&android_fallback_url=${encodeURIComponent(ANDROID_STORE_URL)}` +
+          `&ios_fallback_url=${encodeURIComponent(IOS_STORE_URL)}` +
+          `&fallback_url=${encodeURIComponent(ANDROID_STORE_URL)}`;
+      }
     }
-  }
-
-  // 이벤트 바인딩
-  $("btnStart")?.addEventListener("click", () => window.Quiz.startQuiz());
-  $("btnDemo")?.addEventListener("click", () => {
-    window.Quiz.renderResult("PVE");
-    setActiveView("viewResult");
-  });
-  $("btnPrev")?.addEventListener("click", () => window.Quiz.prev());
-  $("btnCopy")?.addEventListener("click", () => copyLink());
-  $("btnShare")?.addEventListener("click", () => shareNative());
-  $("btnRestart")?.addEventListener("click", () => restartToIntro());
-
-  const uidNote = $("uidNote"); if(uidNote) {};
-  window.Quiz.loadFromHash();
-})();
+  
+    async function copyLink(existingLink = null){
+      const link = existingLink || await generateShortLink(); 
+      if (!link) return;
+  
+      try {
+        await navigator.clipboard.writeText(link);
+        toast("짧은 공유 링크가 복사되었어요!");
+      } catch {
+        prompt("아래 링크를 복사하세요!", link);
+      }
+    }
+  
+    async function shareNative() {
+      const link = await generateShortLink(); 
+      if (!link) return;
+  
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: '장보기 MBTI 테스트',
+            text: '나의 장보기 성향을 앱에서 확인해보세요!',
+            url: link,
+          });
+        } catch (err) { }
+      } else {
+        copyLink(link);
+      }
+    }
+  
+    $("btnStart")?.addEventListener("click", () => window.Quiz.startQuiz());
+    $("btnDemo")?.addEventListener("click", () => {
+      window.Quiz.renderResult("PVE");
+      setActiveView("viewResult");
+    });
+    $("btnPrev")?.addEventListener("click", () => window.Quiz.prev());
+    $("btnCopy")?.addEventListener("click", () => copyLink());
+    $("btnShare")?.addEventListener("click", () => shareNative());
+    $("btnRestart")?.addEventListener("click", () => restartToIntro());
+  
+    const uidNote = $("uidNote"); if(uidNote) {};
+    window.Quiz.loadFromHash();
+  })();
