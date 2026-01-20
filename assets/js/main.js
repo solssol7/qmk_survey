@@ -51,88 +51,99 @@
       async onSharedResult({ resultKey }){ }
     };
   
-    // [수정됨] 숏링크 생성 함수
-    async function generateShortLink() {
-      toast("공유 링크를 만들고 있어요...");
-  
-      if (!AIRBRIDGE_API_TOKEN || AIRBRIDGE_API_TOKEN.includes("여기에")) {
-        console.error("❌ API Token이 설정되지 않았습니다.");
-        return null;
-      }
-  
-      const targetParams = new URLSearchParams();
-      if (user_id) targetParams.set("recommend_user_id", user_id);
-      if (window.Quiz.state.resultKey) targetParams.set("t", window.Quiz.state.resultKey);
-      const innerUrl = `${WEBVIEW_TARGET_DOMAIN}?${targetParams.toString()}`;
-  
-      const appScheme = `qmarket://webview?link=${encodeURIComponent(innerUrl)}`;
-  
-      try {
-        const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-        const apiUrl = isLocal ? 'https://api.airbridge.io/v1/tracking-links' : '/api/airbridge/links';
-  
-        console.log(`[Link] 요청 시작: ${apiUrl}`);
-  
-        const response = await fetch(apiUrl, {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${AIRBRIDGE_API_TOKEN}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            channel: "in_app_referral",
-            campaignParams: {
-              campaign: "friend_invite_2025",
-              ad_group: "referral",
-              ad_creative: "invitation"
-            },
-            // 🔴 [수정] 에러를 유발하는 isReengagement 필드를 완전히 삭제했습니다.
-            // (삭제 시 기본값으로 처리되어 오류가 발생하지 않습니다)
-            
-            deeplinkUrl: appScheme,
-            deeplinkOption: {
-              showAlertForInitialDeeplinkingIssue: true
-            },
-            fallbackPaths: {
-              option: {
-                android: ANDROID_STORE_URL,
-                ios: IOS_STORE_URL
-              }
-            },
-            ogTag: {
-              title: "장보기 MBTI 테스트",
-              description: "나의 장보기 성향을 앱에서 확인해보세요!",
-              image: "https://mbti.event.qmarket.me/assets/img/intro/intro.webp"
-            }
-          })
-        });
-  
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error(`[Link] API 에러(${response.status}):`, errorText);
-          throw new Error(`API 오류: ${response.status}`);
-        }
-  
-        const resJson = await response.json();
-        const shortLink = resJson.data?.trackingLink?.shortURL;
-  
-        if (!shortLink) throw new Error("응답에 shortURL이 없습니다.");
-  
-        console.log("[Link] 생성 성공:", shortLink);
-        return shortLink; 
-  
-      } catch (e) {
-        console.error("[Link] 실패, 롱링크 대체:", e);
-        return `https://${AIRBRIDGE_APP_NAME}.airbridge.io/links` +
-          `?channel=in_app_referral` +
-          `&campaign=friend_invite_2025` +
-          `&deeplink_url=${encodeURIComponent(appScheme)}` +
-          `&android_fallback_url=${encodeURIComponent(ANDROID_STORE_URL)}` +
-          `&ios_fallback_url=${encodeURIComponent(IOS_STORE_URL)}` +
-          `&fallback_url=${encodeURIComponent(ANDROID_STORE_URL)}`;
-      }
+// [수정] 디버깅을 위해 응답 전체를 로그로 출력하는 버전
+  async function generateShortLink() {
+    toast("공유 링크를 만들고 있어요...");
+
+    if (!AIRBRIDGE_API_TOKEN || AIRBRIDGE_API_TOKEN.includes("여기에")) {
+      console.error("❌ API Token이 설정되지 않았습니다.");
+      return null;
     }
-  
+
+    const targetParams = new URLSearchParams();
+    if (user_id) targetParams.set("recommend_user_id", user_id);
+    if (window.Quiz.state.resultKey) targetParams.set("t", window.Quiz.state.resultKey);
+    const innerUrl = `${WEBVIEW_TARGET_DOMAIN}?${targetParams.toString()}`;
+
+    const appScheme = `qmarket://webview?link=${encodeURIComponent(innerUrl)}`;
+
+    try {
+      // 로컬/배포 환경 구분
+      const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+      const apiUrl = isLocal ? 'https://api.airbridge.io/v1/tracking-links' : '/api/airbridge/links';
+
+      console.log(`[Link] 요청 시작: ${apiUrl}`);
+
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${AIRBRIDGE_API_TOKEN}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          channel: "in_app_referral",
+          campaignParams: {
+            campaign: "friend_invite_2025",
+            ad_group: "referral",
+            ad_creative: "invitation"
+          },
+          // isReengagement 제거됨 (성공)
+          deeplinkUrl: appScheme,
+          deeplinkOption: {
+            showAlertForInitialDeeplinkingIssue: true
+          },
+          fallbackPaths: {
+            option: {
+              android: ANDROID_STORE_URL,
+              ios: IOS_STORE_URL
+            }
+          },
+          ogTag: {
+            title: "장보기 MBTI 테스트",
+            description: "나의 장보기 성향을 앱에서 확인해보세요!",
+            image: "https://mbti.event.qmarket.me/assets/img/intro/intro.webp"
+          }
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`[Link] API 에러(${response.status}):`, errorText);
+        throw new Error(`API 오류: ${response.status}`);
+      }
+
+      const resJson = await response.json();
+      
+      // 🔍 [디버깅] 서버가 보낸 전체 응답을 콘솔에 출력
+      console.log("[Link] 응답 전체:", JSON.stringify(resJson, null, 2));
+
+      // 데이터 구조 확인
+      const shortLink = resJson.data?.trackingLink?.shortURL;
+
+      if (!shortLink) {
+        // 혹시 shortURL 대신 click 링크만 있는지 확인
+        if (resJson.data?.trackingLink?.link?.click) {
+            console.warn("[Link] 숏링크 대신 롱링크(click)를 사용합니다.");
+            return resJson.data.trackingLink.link.click;
+        }
+        throw new Error("응답에 shortURL이 없습니다.");
+      }
+
+      console.log("[Link] 생성 성공:", shortLink);
+      return shortLink; 
+
+    } catch (e) {
+      console.error("[Link] 실패, 롱링크 대체:", e);
+      // 실패 시 폴백 롱링크 반환
+      return `https://${AIRBRIDGE_APP_NAME}.airbridge.io/links` +
+        `?channel=in_app_referral` +
+        `&campaign=friend_invite_2025` +
+        `&deeplink_url=${encodeURIComponent(appScheme)}` +
+        `&android_fallback_url=${encodeURIComponent(ANDROID_STORE_URL)}` +
+        `&ios_fallback_url=${encodeURIComponent(IOS_STORE_URL)}` +
+        `&fallback_url=${encodeURIComponent(ANDROID_STORE_URL)}`;
+    }
+  }
     async function copyLink(existingLink = null){
       const link = existingLink || await generateShortLink(); 
       if (!link) return;
