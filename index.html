@@ -8,11 +8,9 @@
 
   <script>
     (function() {
-      // Airbridge 글로벌 네임스페이스 설정
       window.Airbridge = "airbridge";
       window.airbridge = window.airbridge || { init: function(c) { window.airbridge._initParams = c; } };
       
-      // 스크립트 로드
       var script = document.createElement('script');
       script.src = "https://static.airbridge.io/sdk/web/v1/airbridge.min.js";
       script.async = true;
@@ -408,6 +406,70 @@
       </section>
     </main>
     <div id="toast" class="toast"></div>
+  </div>
+  
+  <style>
+    .popup-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6); z-index: 10000;
+      display: none; /* 기본 숨김 */
+      justify-content: center; align-items: center;
+      padding: 20px;
+      backdrop-filter: blur(4px);
+    }
+    .popup-content {
+      background: white; padding: 30px 24px; border-radius: 24px;
+      text-align: center; width: 100%; max-width: 320px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+    }
+    .popup-badge {
+      display: inline-block; background: #ffe3e3; color: #fa5252;
+      font-size: 12px; font-weight: 800; padding: 4px 8px;
+      border-radius: 6px; margin-bottom: 10px;
+    }
+    .popup-title {
+      font-size: 20px; font-weight: 800; color: #333; margin: 0 0 8px; line-height: 1.3;
+    }
+    .popup-desc {
+      font-size: 15px; color: #666; margin: 0 0 20px; line-height: 1.5;
+    }
+    .popup-icon { font-size: 60px; margin-bottom: 20px; display: block; }
+    
+    .btn-install {
+      width: 100%; padding: 16px; border-radius: 16px; border: none;
+      background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+      color: white; font-size: 16px; font-weight: 800;
+      cursor: pointer; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+      transition: transform 0.1s;
+    }
+    .btn-install:active { transform: scale(0.96); }
+    
+    .btn-close-text {
+      background: none; border: none; color: #adb5bd; margin-top: 16px;
+      font-size: 13px; text-decoration: underline; cursor: pointer;
+    }
+
+    @keyframes popUp { 
+      from { transform: scale(0.8) translateY(20px); opacity: 0; } 
+      to { transform: scale(1) translateY(0); opacity: 1; } 
+    }
+  </style>
+
+  <div id="couponPopup" class="popup-overlay">
+    <div class="popup-content">
+      <span class="popup-badge">EVENT</span>
+      <h3 class="popup-title">장보기 20% 쿠폰<br>받으러 가실래요? 💌</h3>
+      <p class="popup-desc">앱 설치하고 첫 주문하면<br>즉시 할인해 드려요!</p>
+      
+      <span class="popup-icon">🎁</span>
+
+      <button id="btnInstallApp" class="btn-install">
+        앱에서 쿠폰 받기
+      </button>
+      <button id="btnClosePopup" class="btn-close-text">괜찮아요, 닫기</button>
+    </div>
   </div>
 
   <script src="./assets/js/config.js"></script>
