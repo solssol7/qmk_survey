@@ -47,86 +47,103 @@
     async onSharedResult({ resultKey }){ }
   };
 
-  // [핵심 변경] REST API를 사용한 숏링크 생성 함수
   async function generateShortLink() {
-    toast("공유 링크를 만들고 있어요...");
+  toast("공유 링크를 만들고 있어요...");
+  
+  // [디버그] 로그 그룹 시작
+  console.group("🔗 [Airbridge] 숏링크 생성 디버깅");
 
-    // 1. 내부 웹 URL 구성
-    const targetParams = new URLSearchParams();
-    if (user_id) targetParams.set("recommend_user_id", user_id);
-    if (window.Quiz.state.resultKey) targetParams.set("t", window.Quiz.state.resultKey);
-    const innerUrl = `${WEBVIEW_TARGET_DOMAIN}?${targetParams.toString()}`;
+  // 1. 내부 웹 URL 구성
+  const targetParams = new URLSearchParams();
+  if (user_id) targetParams.set("recommend_user_id", user_id);
+  if (window.Quiz.state.resultKey) targetParams.set("t", window.Quiz.state.resultKey);
+  const innerUrl = `${WEBVIEW_TARGET_DOMAIN}?${targetParams.toString()}`;
 
-    // 2. 딥링크 스킴 구성
-    const appScheme = `qmarket://webview?link=${encodeURIComponent(innerUrl)}`;
+  // 2. 앱 스킴 구성
+  const appScheme = `qmarket://webview?link=${encodeURIComponent(innerUrl)}`;
+  
+  console.log("1️⃣ 타겟 URL:", innerUrl);
+  console.log("2️⃣ 딥링크 Scheme:", appScheme);
 
-    try {
-      // API 호출 (vercel.json의 rewrites를 통해 우회)
-      // 만약 로컬 테스트 등 프록시가 없는 환경이라면 'https://api.airbridge.io/v1/tracking-links' 직접 사용
-      const apiUrl = location.hostname === 'localhost' || location.hostname === '127.0.0.1' 
-                     ? 'https://api.airbridge.io/v1/tracking-links' 
-                     : '/api/airbridge/links';
+  try {
+    // API 주소 결정 (로컬/배포 환경 분기)
+    // 주의: 로컬에서 테스트 시 Vercel Proxy가 없으면 CORS 에러가 날 수 있습니다.
+    const apiUrl = '/api/airbridge/links'; 
+    console.log("3️⃣ 요청 보낼 API 주소:", apiUrl);
 
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Authorization": AIRBRIDGE_WEB_TOKEN,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          channel: "in_app_referral",
-          campaignParams: {
-            campaign: "friend_invite_2025",
-            ad_group: "referral",
-            ad_creative: "invitation",
-            sub_id: user_id // 필요한 경우 유저 ID를 sub_id 등으로 활용
-          },
-          isReengagement: false,
-          deeplinkUrl: appScheme, // SDK(snake_case)와 달리 API는 camelCase 사용
-          deeplinkOption: {
-            showAlertForInitialDeeplinkingIssue: true
-          },
-          fallbackPaths: {
-            option: {
-              android: ANDROID_STORE_URL,
-              ios: IOS_STORE_URL
-            }
-          },
-          ogTag: {
-            title: "장보기 MBTI 테스트",
-            description: "나의 장보기 성향을 앱에서 확인해보세요!",
-            image: "https://mbti.event.qmarket.me/assets/img/intro/intro.webp"
-          }
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`API 오류: ${response.status}`);
+    const requestBody = {
+      channel: "in_app_referral",
+      campaignParams: {
+        campaign: "friend_invite_2025",
+        ad_group: "referral",
+        ad_creative: "invitation"
+      },
+      isReengagement: false,
+      deeplinkUrl: appScheme,
+      deeplinkOption: {
+        showAlertForInitialDeeplinkingIssue: true
+      },
+      fallbackPaths: {
+        option: {
+          android: ANDROID_STORE_URL,
+          ios: IOS_STORE_URL
+        }
+      },
+      ogTag: {
+        title: "장보기 MBTI 테스트",
+        description: "나의 장보기 성향을 앱에서 확인해보세요!",
+        image: "https://mbti.event.qmarket.me/assets/img/intro/intro.webp"
       }
+    };
 
-      const resJson = await response.json();
-      
-      // 응답 구조: { data: { trackingLink: { shortURL: "..." } } }
-      const shortLink = resJson.data?.trackingLink?.shortURL;
+    console.log("4️⃣ 요청 바디(Payload):", JSON.stringify(requestBody, null, 2));
 
-      if (!shortLink) throw new Error("숏링크 응답 없음");
+    // API 호출
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Authorization": AIRBRIDGE_WEB_TOKEN,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(requestBody)
+    });
 
-      return shortLink; 
+    console.log("5️⃣ HTTP 상태 코드:", response.status, response.statusText);
 
-    } catch (e) {
-      console.error("숏링크 생성 실패, 롱링크로 대체합니다.", e);
-      
-      // 실패 시 롱링크 반환 (파라미터 SDK 형식으로 매핑)
-      return `https://${AIRBRIDGE_APP_NAME}.airbridge.io/links` +
-        `?channel=in_app_referral` +
-        `&campaign=friend_invite_2025` +
-        `&deeplink_url=${encodeURIComponent(appScheme)}` +
-        `&android_fallback_url=${encodeURIComponent(ANDROID_STORE_URL)}` +
-        `&ios_fallback_url=${encodeURIComponent(IOS_STORE_URL)}` +
-        `&fallback_url=${encodeURIComponent(ANDROID_STORE_URL)}`;
+    const responseText = await response.text();
+    console.log("6️⃣ 응답 본문(Raw):", responseText);
+
+    if (!response.ok) {
+      throw new Error(`API 응답 에러: ${response.status} - ${responseText}`);
     }
-  }
 
+    const resJson = JSON.parse(responseText);
+    const shortLink = resJson.data?.trackingLink?.shortURL;
+    
+    console.log("7️⃣ 추출된 숏링크:", shortLink);
+
+    if (!shortLink) {
+      throw new Error("응답 JSON에 shortURL 필드가 없습니다.");
+    }
+
+    console.log("✅ 숏링크 생성 성공!");
+    console.groupEnd();
+    return shortLink; 
+
+  } catch (e) {
+    console.error("❌ 숏링크 생성 실패 원인:", e);
+    console.groupEnd();
+    
+    // 실패 시 롱링크 반환 (기존 로직)
+    return `https://${AIRBRIDGE_APP_NAME}.airbridge.io/links` +
+      `?channel=in_app_referral` +
+      `&campaign=friend_invite_2025` +
+      `&deeplink_url=${encodeURIComponent(appScheme)}` +
+      `&android_fallback_url=${encodeURIComponent(ANDROID_STORE_URL)}` +
+      `&ios_fallback_url=${encodeURIComponent(IOS_STORE_URL)}` +
+      `&fallback_url=${encodeURIComponent(ANDROID_STORE_URL)}`;
+  }
+}
   // [링크 복사]
   async function copyLink(existingLink = null){
     const link = existingLink || await generateShortLink(); 
