@@ -79,7 +79,6 @@
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
-          // [수정됨] Bearer 접두어 추가 (중요!)
           "Authorization": `Bearer ${AIRBRIDGE_API_TOKEN}`,
           "Content-Type": "application/json"
         },
@@ -90,7 +89,9 @@
             ad_group: "referral",
             ad_creative: "invitation"
           },
-          isReengagement: false,
+          // [수정 포인트] false -> "Off" (따옴표로 감싼 문자열이어야 합니다)
+          isReengagement: "Off", 
+          
           deeplinkUrl: appScheme,
           deeplinkOption: {
             showAlertForInitialDeeplinkingIssue: true
