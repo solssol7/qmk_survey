@@ -7,7 +7,22 @@
   <title>장보기 MBTI 테스트</title>
 
   <script>
-    !function(e,n,t,r,o,i){e.airbridge=e.airbridge||{init:function(t){e.airbridge._initParams=t}},i=n.createElement(t),i.src=r,i.async=!0,i.onload=function(){e.airbridge.createAirbridge()},o=n.getElementsByTagName(t)[0],o.parentNode.insertBefore(i,o)}(window,document,"script","https://static.airbridge.io/sdk/web/v1/airbridge.min.js");
+    (function() {
+      // Airbridge 글로벌 네임스페이스 설정
+      window.Airbridge = "airbridge";
+      window.airbridge = window.airbridge || { init: function(c) { window.airbridge._initParams = c; } };
+      
+      // 스크립트 로드
+      var script = document.createElement('script');
+      script.src = "https://static.airbridge.io/sdk/web/v1/airbridge.min.js";
+      script.async = true;
+      script.onload = function() {
+        if (window.airbridge && typeof window.airbridge.createAirbridge === 'function') {
+          window.airbridge.createAirbridge();
+        }
+      };
+      document.head.appendChild(script);
+    })();
   </script>
 
   <meta property="og:type" content="website" />
