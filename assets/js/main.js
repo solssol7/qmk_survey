@@ -9,7 +9,7 @@
   const AIRBRIDGE_APP_NAME = "qmarket"; 
   
   // 1. Web Token: SDK 초기화 및 이벤트 수집용 (기존 값 유지)
-  const AIRBRIDGE_WEB_TOKEN = "aa31841e91b24c5395aa6569c7e9eced"; 
+  const AIRBRIDGE_WEB_TOKEN = "b9570777b7534dfc85eb1bf89204f2e7"; 
 
   // 2. API Token: 트래킹 링크 생성용 (새로 복사해서 채워주세요!)
   // [!] 대시보드 > Settings > Tokens > API Token 값을 아래 따옴표 안에 넣으세요.
