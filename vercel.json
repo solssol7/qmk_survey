@@ -3,6 +3,10 @@
     {
       "source": "/api/supabase/:match*",
       "destination": "https://htcxkbijmiptoubmkhkm.supabase.co/:match*"
+    },
+    {
+      "source": "/api/airbridge/links",
+      "destination": "https://api.airbridge.io/v1/tracking-links"
     }
   ]
 }
