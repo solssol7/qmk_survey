@@ -7,28 +7,9 @@
   <title>장보기 MBTI 테스트</title>
 
   <script>
-    (function() {
-      // 1. 글로벌 변수 설정
-      window.Airbridge = 'airbridge';
-      
-      // 2. 스텁(Stub) 객체 생성: 미리 명령을 받아둘 큐(Queue) 생성
-      window.airbridge = window.airbridge || { q: [] };
-
-      // 3. 주요 메서드 미리 만들어두기 (.init 호출 시 에러 방지)
-      ['init', 'createTrackingLink', 'track', 'events'].forEach(function(method) {
-        window.airbridge[method] = window.airbridge[method] || function() {
-          // SDK 로드 전 호출된 명령은 큐에 저장
-          window.airbridge.q.push([method].concat(Array.prototype.slice.call(arguments)));
-        };
-      });
-
-      // 4. 실제 SDK 스크립트 로드
-      var script = document.createElement('script');
-      script.src = 'https://static.airbridge.io/sdk/latest/airbridge.min.js';
-      script.async = true;
-      document.getElementsByTagName('head')[0].appendChild(script);
-    })();
+    !function(e,n,t,r,o,i){e.airbridge=e.airbridge||{init:function(t){e.airbridge._initParams=t}},i=n.createElement(t),i.src=r,i.async=!0,i.onload=function(){e.airbridge.createAirbridge()},o=n.getElementsByTagName(t)[0],o.parentNode.insertBefore(i,o)}(window,document,"script","https://static.airbridge.io/sdk/web/v1/airbridge.min.js");
   </script>
+
   <meta property="og:type" content="website" />
   <meta property="og:title" content="장보기 MBTI 테스트" />
   <meta property="og:description" content="1분 만에 끝나는 나의 장보기 성향 분석! 나와 딱 맞는 마트 쇼핑 유형은?" />
